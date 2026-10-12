@@ -118,10 +118,10 @@
 					</li>
 				</ul>
 
-				<div class="relative overflow-hidden">
+				<div class="relative grid overflow-hidden">
 					{#key active}
 						<div
-							class="grid h-full grid-cols-[1fr_1fr_300px] gap-8 p-4 pl-10"
+							class="grid h-full grid-cols-[1fr_1fr_300px] gap-8 p-4 pl-10 [grid-area:1/1]"
 							in:fly={{ x: 10, duration: reducedMotion() ? 0 : 220, delay: 60 }}
 							out:fade={{ duration: 80 }}
 						>
