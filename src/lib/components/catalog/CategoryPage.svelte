@@ -13,7 +13,9 @@
 	import Seo from '#lib/seo/Seo.svelte';
 	import Accordion from '#lib/components/ui/Accordion.svelte';
 	import Breadcrumbs from '#lib/components/ui/Breadcrumbs.svelte';
+	import { productCutout } from '#lib/images.ts';
 	import CatalogView from './CatalogView.svelte';
+	import LandingGraphic from './LandingGraphic.svelte';
 
 	type Data = {
 		h1: string;
@@ -30,10 +32,19 @@
 		filters: FilterKey[];
 		eyebrow?: string;
 		brand?: Brand;
+		/** SEO-сторінка: id інфографіки */
+		graphic?: string;
 	};
 	let { data }: { data: Data } = $props();
 
 	let expanded = $state(false);
+	// колаж шапки: до трьох популярних товарів розділу, що мають вирізку
+	const collage = $derived(
+		data.initial.items
+			.map((p) => ({ slug: p.slug, alt: p.alt, pic: productCutout(p.slug) }))
+			.filter((x) => x.pic)
+			.slice(0, 3)
+	);
 	// комбінації фільтрів не індексуємо; canonical — завжди основна сторінка розділу
 	const filtered = $derived(
 		browser &&
@@ -57,14 +68,37 @@
 <div class="wrap pt-6">
 	<Breadcrumbs items={data.crumbs} />
 	<div
-		class="mt-6 flex flex-wrap items-end justify-between gap-x-10 gap-y-4 border-b border-line pb-8"
+		class={[
+			'mt-6 grid grid-cols-[minmax(0,1fr)] items-center gap-8',
+			(data.graphic || collage.length) && 'lg:grid-cols-[minmax(0,1fr)_minmax(0,480px)] lg:gap-12'
+		]}
 	>
-		<div class="max-w-2xl">
+		<div class="head-in max-w-2xl">
 			{#if data.eyebrow}<p class="eyebrow mb-3">{data.eyebrow}</p>{/if}
-			<h1 class="h-display text-[clamp(2rem,4.4vw,3.5rem)]">{data.h1}</h1>
-			<p class="mt-4 text-[15px] text-graphite">{data.lead}</p>
+			<h1 class="h-display text-[clamp(2.4rem,5.6vw,4.75rem)]">{data.h1}</h1>
+			<p class="mt-5 max-w-xl text-[17px] text-graphite">{data.lead}</p>
+			<p class="mt-6 inline-flex h-9 items-center rounded-full bg-white px-4 text-sm">
+				<span class="mono mr-1.5 font-medium">{data.initial.total}</span> у розділі
+			</p>
 		</div>
-		<p class="mono text-sm text-graphite">{data.initial.total} у розділі</p>
+		{#if data.graphic}
+			<LandingGraphic id={data.graphic} />
+		{:else if collage.length}
+			<div
+				class="stage collage relative hidden aspect-[4/3] rounded-lg md:block"
+				aria-hidden="true"
+			>
+				{#each collage as c, i (c.slug)}
+					<enhanced:img
+						src={c.pic!}
+						alt=""
+						sizes="260px"
+						class="cutout c-{i} absolute object-contain"
+						style="--i: {i}"
+					/>
+				{/each}
+			</div>
+		{/if}
 	</div>
 	{#if data.subs.length}
 		<nav aria-label="Підрозділи" class="no-scrollbar -mx-4 overflow-x-auto px-4 md:mx-0 md:px-0">
@@ -88,12 +122,12 @@
 
 	{#if data.seoText.length}
 		<section
-			class="mt-20 grid gap-8 border-t border-line pt-12 lg:grid-cols-[260px_1fr] lg:gap-10"
+			class="mt-24 grid gap-8 rounded-lg bg-white p-6 md:p-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-12"
 			aria-labelledby="seo-title"
 		>
-			<p class="eyebrow">Довідка</p>
+			<p class="text-graphite">Довідка</p>
 			<div class="max-w-3xl">
-				<h2 id="seo-title" class="text-2xl font-semibold tracking-tight">
+				<h2 id="seo-title" class="h-section text-[clamp(1.8rem,3vw,2.6rem)]">
 					{data.seoText[0].title}
 				</h2>
 				<div class="relative mt-4 space-y-4 text-graphite">
@@ -122,11 +156,49 @@
 
 	{#if data.faq.length}
 		<section
-			class="mt-16 grid gap-8 lg:grid-cols-[260px_1fr] lg:gap-10"
+			class="mt-16 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-12"
 			aria-labelledby="faq-title"
 		>
-			<h2 id="faq-title" class="text-2xl font-semibold tracking-tight">Питання й відповіді</h2>
+			<h2 id="faq-title" class="h-section text-[clamp(1.8rem,3vw,2.6rem)]">Питання й відповіді</h2>
 			<div class="max-w-3xl"><Accordion id="cat-faq" items={data.faq} /></div>
 		</section>
 	{/if}
 </div>
+
+<style>
+	/* колаж: три вирізки «на сцені», кожна з’являється з нахилом */
+	.collage :global(.cutout) {
+		animation: drop-in 0.9s var(--ease-out-soft) calc(var(--i) * 110ms + 120ms) both;
+	}
+	.collage :global(.c-0) {
+		left: 6%;
+		bottom: 12%;
+		width: 52%;
+		height: 70%;
+		z-index: 2;
+	}
+	.collage :global(.c-1) {
+		right: 6%;
+		top: 10%;
+		width: 40%;
+		height: 46%;
+	}
+	.collage :global(.c-2) {
+		right: 10%;
+		bottom: 10%;
+		width: 34%;
+		height: 38%;
+		z-index: 1;
+	}
+	@keyframes drop-in {
+		from {
+			opacity: 0;
+			transform: translateY(24px) rotate(-4deg) scale(0.94);
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.collage :global(.cutout) {
+			animation: none;
+		}
+	}
+</style>

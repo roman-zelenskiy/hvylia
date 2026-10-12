@@ -50,6 +50,7 @@ export function load({ params }) {
 		crumbs: [...crumbsBase, { label: l.h1 }],
 		subs: c.subs.map((x) => ({ href: `/${c.slug}/${x.slug}`, label: x.name })),
 		seoText: l.text,
+		graphic: l.slug,
 		faq: l.faq,
 		...catalogPage(l.match)
 	};

@@ -258,7 +258,7 @@
 				/>
 			</div>
 		{:else}
-			<div class="mt-10 border border-dashed border-line-2 px-6 py-16 text-center">
+			<div class="mt-10 rounded-lg bg-white px-6 py-20 text-center">
 				<p class="text-lg font-medium">Нічого не знайдено</p>
 				<p class="mx-auto mt-2 max-w-sm text-graphite">
 					Спробуйте прибрати частину фільтрів або розширити діапазон ціни.

@@ -8,7 +8,8 @@
 	import type { Summary } from '#lib/catalog/query.ts';
 	import { formatDate } from '#lib/catalog/format.ts';
 	import { FREE_SHIPPING_FROM, RETURN_DAYS } from '#lib/data/site.ts';
-	import { productImage } from '#lib/images.ts';
+	import { productCutout, productImage } from '#lib/images.ts';
+	import { curve, hasCurve } from '#lib/audio/fr.ts';
 	import { isValidPhone } from '#lib/phone.ts';
 	import { reducedMotion } from '#lib/motion.ts';
 	import { breadcrumbs, product as productLd } from '#lib/seo/schema.ts';
@@ -16,6 +17,7 @@
 	import { addToCart, toggleCompare, toggleWishlist } from '#lib/stores/actions.ts';
 	import Seo from '#lib/seo/Seo.svelte';
 	import Gallery from '#lib/components/product/Gallery.svelte';
+	import FRGraph from '#lib/components/audio/FRGraph.svelte';
 	import Reviews from '#lib/components/product/Reviews.svelte';
 	import ProductCard from '#lib/components/shop/ProductCard.svelte';
 	import Breadcrumbs from '#lib/components/ui/Breadcrumbs.svelte';
@@ -54,7 +56,22 @@
 		{ label: p.name }
 	]);
 	const path = $derived(`/product/${p.slug}`);
-	const lcpSource = $derived(productImage(p.images[0]).sources.avif);
+	const cut = $derived(productCutout(p.slug));
+	const lcpSource = $derived((cut ?? productImage(p.images[0])).sources.avif);
+	// АЧХ: цей товар + схожі моделі того ж класу для порівняння
+	const frCurves = $derived(
+		hasCurve(p.facets.type)
+			? [
+					{ id: p.slug, label: p.name, values: curve(p.facets.type, p.slug)! },
+					...data.similar
+						.filter((s) => hasCurve(s.type))
+						.slice(0, 2)
+						.map((s) => ({ id: s.slug, label: s.name, values: curve(s.type, s.slug)! }))
+				]
+			: []
+	);
+	// активна крива на графіку; інший товар — знову його власна
+	let frActive = $derived(p.slug);
 	const imageUrls = $derived(p.images.map((f) => productImage(f).img.src));
 	const recentItems = $derived(
 		recent.ready
@@ -142,14 +159,14 @@
 	<Breadcrumbs items={crumbs} />
 
 	<div class="mt-6 grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-14">
-		<Gallery images={p.images} alt={p.alt} name={p.name} />
+		<Gallery images={p.images} alt={p.alt} name={p.name} slug={p.slug} />
 
 		<div>
 			<a
 				href={resolve('/brand/[slug]', { slug: data.brand.slug })}
-				class="eyebrow wave-link hover:text-blue">{data.brand.name}</a
+				class="wave-link text-[15px] font-medium text-blue">{data.brand.name}</a
 			>
-			<h1 class="h-display mt-3 text-[clamp(1.9rem,3.4vw,2.75rem)]">{p.name}</h1>
+			<h1 class="h-display mt-2 text-[clamp(2.2rem,4.2vw,3.6rem)]">{p.name}</h1>
 			<div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
 				{#if data.rating.count}
 					<button
@@ -165,9 +182,12 @@
 				{/if}
 				<span class="mono text-xs text-graphite">Код: {p.id.toUpperCase()}</span>
 			</div>
-			<p class="mt-5 text-[15px] text-graphite">{p.short}</p>
+			<p class="mt-5 max-w-xl text-[17px] text-graphite">{p.short}</p>
 
-			<div bind:this={buyBox} class="mt-6 border-y border-line py-6">
+			<div
+				bind:this={buyBox}
+				class="mt-7 rounded-lg bg-white p-6 shadow-[0_1px_0_rgb(8_9_12/0.04)] sm:p-7"
+			>
 				<Price price={p.price} old={p.oldPrice} size="lg" />
 				<p
 					class={[
@@ -210,7 +230,7 @@
 					</Button>
 					<button
 						type="button"
-						class="icon-btn !h-[52px] !w-[52px] shadow-[inset_0_0_0_1px_var(--color-line-2)]"
+						class="icon-btn !h-[52px] !w-[52px] bg-paper"
 						aria-pressed={wishlist.ready && wishlist.has(p.slug)}
 						aria-label="В обране"
 						onclick={() => toggleWishlist(p.slug, p.name)}
@@ -222,7 +242,7 @@
 					</button>
 					<button
 						type="button"
-						class="icon-btn !h-[52px] !w-[52px] shadow-[inset_0_0_0_1px_var(--color-line-2)]"
+						class="icon-btn !h-[52px] !w-[52px] bg-paper"
 						aria-pressed={compare.ready && compare.has(p.slug)}
 						aria-label="Порівняти"
 						onclick={() => toggleCompare(p.slug, p.name)}
@@ -265,16 +285,58 @@
 				</li>
 			</ul>
 
-			<ul
-				class="mt-6 grid grid-cols-2 gap-px border border-line bg-line"
-				aria-label="Ключові характеристики"
-			>
-				{#each p.highlights as h (h)}<li class="mono bg-white px-3 py-2.5 text-[12.5px]">
+			<ul class="mt-6 flex flex-wrap gap-2" aria-label="Ключові характеристики">
+				{#each p.highlights as h (h)}<li class="rounded-full bg-white px-4 py-2 text-sm">
 						{h}
 					</li>{/each}
 			</ul>
 		</div>
 	</div>
+
+	{#if frCurves.length}
+		<section class="mt-20 rounded-lg bg-white p-6 md:p-10" aria-labelledby="fr-title">
+			<div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:items-start">
+				<div>
+					<h2 id="fr-title" class="h-section text-[clamp(1.8rem,3vw,2.6rem)]">
+						Як звучить {p.name}
+					</h2>
+					<p class="mt-4 text-graphite">
+						Частотна характеристика: які частоти модель підсилює, а які приглушує. Наведіть курсор,
+						щоб побачити рівень на будь-якій частоті.
+					</p>
+					{#if frCurves.length > 1}
+						<div class="mt-6 flex flex-wrap gap-2" role="radiogroup" aria-label="Модель на графіку">
+							{#each frCurves as c (c.id)}
+								<label class="chip">
+									<input
+										type="radio"
+										class="sr-only"
+										name="fr"
+										value={c.id}
+										checked={frActive === c.id}
+										onchange={() => (frActive = c.id)}
+									/>
+									{c.label}
+								</label>
+							{/each}
+						</div>
+					{/if}
+				</div>
+				{#key p.slug}
+					<FRGraph
+						curves={frCurves}
+						active={frActive}
+						sweep
+						height={300}
+						label="Частотна характеристика {p.name} у порівнянні зі схожими моделями"
+					/>
+				{/key}
+			</div>
+			<p class="mt-4 text-xs text-mute">
+				Демонстраційні дані, побудовані за типовими рисами класу пристроїв.
+			</p>
+		</section>
+	{/if}
 
 	<section id="product-tabs" class="mt-16" aria-label="Детальна інформація">
 		<Tabs id="pd" {tabs} bind:active={tab}>
@@ -327,7 +389,9 @@
 	{#each [{ title: 'З цим купують', items: data.together }, { title: 'Схожі товари', items: data.similar }, { title: 'Ви переглядали', items: recentItems }] as block (block.title)}
 		{#if block.items.length}
 			<section class="mt-20" aria-labelledby="blk-{block.title}">
-				<h2 id="blk-{block.title}" class="text-2xl font-semibold tracking-tight">{block.title}</h2>
+				<h2 id="blk-{block.title}" class="h-section text-[clamp(1.8rem,3vw,2.6rem)]">
+					{block.title}
+				</h2>
 				<ul class="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
 					{#each block.items as s (s.slug)}<li><ProductCard product={s} /></li>{/each}
 				</ul>
@@ -339,16 +403,22 @@
 <!-- липка панель покупки: з’являється, коли основна кнопка пішла за край екрана -->
 {#if !buyVisible}
 	<div
-		class="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 backdrop-blur"
-		transition:fly={{ y: 80, duration: reducedMotion() ? 0 : 240 }}
+		class="fixed inset-x-3 bottom-3 z-30 md:inset-x-5"
+		transition:fly={{ y: 100, duration: reducedMotion() ? 0 : 320 }}
 	>
-		<div class="wrap flex h-[72px] items-center gap-4">
-			<enhanced:img
-				src={productImage(p.images[0])}
-				alt=""
-				sizes="48px"
-				class="hidden h-12 w-12 object-cover sm:block"
-			/>
+		<div
+			class="mx-auto flex h-[72px] max-w-[1100px] items-center gap-4 rounded-[22px] bg-white/90 pr-3 pl-3 shadow-[0_0_0_1px_rgb(8_9_12/0.05),0_24px_48px_-24px_rgb(8_9_12/0.4)] backdrop-blur-xl sm:pl-3"
+		>
+			<span class="stage relative hidden h-12 w-12 shrink-0 rounded-sm sm:block">
+				<enhanced:img
+					src={cut ?? productImage(p.images[0])}
+					alt=""
+					sizes="48px"
+					class={cut
+						? 'cutout absolute inset-[10%] h-[80%] w-[80%] object-contain'
+						: 'h-full w-full rounded-sm object-cover'}
+				/>
+			</span>
 			<div class="min-w-0 flex-1">
 				<p class="truncate text-sm font-medium">{p.name}</p>
 				<p class="text-xs text-graphite">{colorName}</p>

@@ -50,4 +50,4 @@ Workflow `.github/workflows/deploy-pages.yml` собирает и публику
 - Тестовая карта **4242 4242 4242 4242**, любой будущий срок и CVV. Данные карты не сохраняются даже в браузере.
 - Заказ открывается по адресу `/order?id=HV-…` и хранится только в этом браузере.
 
-Домен для canonical, OG и sitemap — `https://hvylia.com.ua` (заглушка, `src/lib/data/site.ts`). Фото — Unsplash, авторы в `src/lib/assets/products/CREDITS.json`; бренды вымышленные.
+Домен для canonical, OG и sitemap — `https://hvylia.com.ua` (заглушка, `src/lib/data/site.ts`). Фото — Unsplash, авторы в `src/lib/assets/products/CREDITS.json`; бренды вымышленные. Вырезанные без фона версии (`src/lib/assets/cutouts/{slug}.png`) сделаны из тех же фото; если для товара вырезки нет, сайт показывает обычное фото. Графики АЧХ — демонстрационные данные (`src/lib/audio/fr.ts`).

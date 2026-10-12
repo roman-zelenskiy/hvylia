@@ -1,6 +1,8 @@
 <script lang="ts">
 	import './layout.css';
 	import { onMount } from 'svelte';
+	import { onNavigate } from '$app/navigation';
+	import { reducedMotion } from '#lib/motion.ts';
 	import { live, loadShop } from '#lib/stores/shop.svelte.ts';
 	import Header from '#lib/components/layout/Header.svelte';
 	import Footer from '#lib/components/layout/Footer.svelte';
@@ -11,7 +13,32 @@
 
 	// localStorage читаємо лише після монтування — серверний HTML і перший рендер клієнта збігаються
 	onMount(loadShop);
+
+	/**
+	 * View Transitions: картинка товару, по якій клікнули, «перелітає» в галерею сторінки товару.
+	 * Ім’я переходу даємо лише клікнутому елементу — однакові імена на сторінці зривають перехід.
+	 */
+	let clicked: Element | null = null;
+	onNavigate((nav) => {
+		if (!document.startViewTransition || reducedMotion()) return;
+		const toProduct = nav.to?.route.id === '/product/[slug]';
+		const src = toProduct
+			? clicked?.closest('[data-vt-scope]')?.querySelector<HTMLElement>('[data-vt]')
+			: null;
+		clicked = null;
+		if (src) src.style.viewTransitionName = 'product-hero';
+		return new Promise((done) => {
+			const t = document.startViewTransition(async () => {
+				if (src) src.style.viewTransitionName = '';
+				done();
+				await nav.complete;
+			});
+			t.finished.finally(() => src && (src.style.viewTransitionName = ''));
+		});
+	});
 </script>
+
+<svelte:document onclickcapture={(e) => (clicked = e.target as Element)} />
 
 <div id="page">
 	<a

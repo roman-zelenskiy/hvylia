@@ -20,8 +20,8 @@
 
 <div class="wrap pt-6">
 	<Breadcrumbs items={[{ href: '/', label: 'Головна' }, { label: 'Обране' }]} />
-	<div class="mt-6 flex items-end justify-between gap-4 border-b border-line pb-8">
-		<h1 class="h-display text-[clamp(2rem,4.4vw,3.5rem)]">Обране</h1>
+	<div class="mt-6 flex items-end justify-between gap-4 pb-4">
+		<h1 class="h-display head-in text-[clamp(2.4rem,5.6vw,4.75rem)]">Обране</h1>
 		{#if items.length}<p class="mono text-sm text-graphite">{goods(items.length)}</p>{/if}
 	</div>
 	{#if !wishlist.ready}
@@ -33,7 +33,7 @@
 			{#each items as p (p.slug)}<li><ProductCard product={p} /></li>{/each}
 		</ul>
 	{:else}
-		<div class="mt-10 border border-dashed border-line-2 px-6 py-16 text-center">
+		<div class="mt-10 rounded-lg bg-white px-6 py-20 text-center">
 			<Heart size={36} strokeWidth={1.3} class="mx-auto text-line-2" />
 			<p class="mt-4 text-lg font-medium">В обраному поки порожньо</p>
 			<p class="mt-1 text-graphite">Натисніть на серце на картці, щоб зберегти товар на потім.</p>

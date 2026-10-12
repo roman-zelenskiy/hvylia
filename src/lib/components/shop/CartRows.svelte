@@ -5,7 +5,7 @@
 	import { fade } from 'svelte/transition';
 	import type { CartRow } from '#lib/catalog/cart.ts';
 	import { formatPrice } from '#lib/catalog/format.ts';
-	import { productImage } from '#lib/images.ts';
+	import { productCutout, productImage } from '#lib/images.ts';
 	import { reducedMotion } from '#lib/motion.ts';
 	import { announce, cart, MAX_QTY } from '#lib/stores/shop.svelte.ts';
 	import Stepper from '#lib/components/ui/Stepper.svelte';
@@ -19,16 +19,27 @@
 		<li class="flex gap-4 py-4" animate:flip={{ duration: ms() }} out:fade={{ duration: ms() / 2 }}>
 			<a
 				href={resolve('/product/[slug]', { slug: r.slug })}
-				class="shrink-0 bg-paper"
+				class="stage relative shrink-0 overflow-hidden rounded-sm {compact
+					? 'h-20 w-20'
+					: 'h-24 w-24'}"
 				tabindex="-1"
 				aria-hidden="true"
 			>
-				<enhanced:img
-					src={productImage(r.product.image)}
-					alt=""
-					sizes="96px"
-					class="{compact ? 'h-20 w-20' : 'h-24 w-24'} object-cover"
-				/>
+				{#if productCutout(r.slug)}
+					<enhanced:img
+						src={productCutout(r.slug)!}
+						alt=""
+						sizes="96px"
+						class="cutout absolute inset-[12%] h-[76%] w-[76%] object-contain"
+					/>
+				{:else}
+					<enhanced:img
+						src={productImage(r.product.image)}
+						alt=""
+						sizes="96px"
+						class="h-full w-full object-cover"
+					/>
+				{/if}
 			</a>
 			<div class="flex min-w-0 flex-1 flex-col">
 				<div class="flex items-start justify-between gap-3">

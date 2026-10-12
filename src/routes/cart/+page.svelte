@@ -38,7 +38,7 @@
 
 <div class="wrap pt-6">
 	<Breadcrumbs items={[{ href: '/', label: 'Головна' }, { label: 'Кошик' }]} />
-	<h1 class="h-display mt-6 border-b border-line pb-8 text-[clamp(2rem,4.4vw,3.5rem)]">Кошик</h1>
+	<h1 class="h-display head-in mt-6 pb-4 text-[clamp(2.4rem,5.6vw,4.75rem)]">Кошик</h1>
 
 	{#if !cart.ready}
 		<div class="mt-8 grid gap-4" aria-hidden="true">
@@ -46,16 +46,16 @@
 		</div>
 	{:else if view.rows.length}
 		<div class="mt-8 grid items-start gap-10 lg:grid-cols-[1fr_380px]">
-			<div>
+			<div class="rounded-lg bg-white p-5 sm:p-7">
 				<FreeShipping total={view.total} />
 				<CartRows rows={view.rows} />
 				<UndoBar />
 			</div>
 			<aside
-				class="grid gap-5 bg-white p-6 ring-1 ring-line lg:sticky lg:top-[150px]"
+				class="grid gap-5 rounded-lg bg-white p-7 lg:sticky lg:top-28"
 				aria-labelledby="sum-title"
 			>
-				<h2 id="sum-title" class="text-lg font-semibold">Разом</h2>
+				<h2 id="sum-title" class="text-2xl font-semibold tracking-[-0.03em]">Разом</h2>
 				<dl class="grid gap-2 text-sm">
 					<div class="flex justify-between">
 						<dt class="text-graphite">{goods(view.count)}</dt>
@@ -79,7 +79,7 @@
 			</aside>
 		</div>
 	{:else}
-		<div class="mt-10 border border-dashed border-line-2 px-6 py-16 text-center">
+		<div class="mt-10 rounded-lg bg-white px-6 py-20 text-center">
 			<ShoppingBag size={36} strokeWidth={1.3} class="mx-auto text-line-2" />
 			<p class="mt-4 text-lg font-medium">Кошик порожній</p>
 			<p class="mt-1 text-graphite">Подивіться хіти — з них зазвичай починають.</p>
@@ -90,7 +90,9 @@
 
 	{#if cart.ready && extras.length}
 		<section class="mt-20" aria-labelledby="extras-title">
-			<h2 id="extras-title" class="text-2xl font-semibold tracking-tight">Додайте до замовлення</h2>
+			<h2 id="extras-title" class="h-section text-[clamp(1.8rem,3vw,2.6rem)]">
+				Додайте до замовлення
+			</h2>
 			<ul class="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
 				{#each extras as p (p.slug)}<li><ProductCard product={p} /></li>{/each}
 			</ul>

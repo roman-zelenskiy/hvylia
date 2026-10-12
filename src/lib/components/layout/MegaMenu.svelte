@@ -4,7 +4,7 @@
 	import { ArrowRight, ChevronRight, LayoutGrid, X } from '@lucide/svelte';
 	import { fade, fly } from 'svelte/transition';
 	import { formatPrice } from '#lib/catalog/format.ts';
-	import { productImage } from '#lib/images.ts';
+	import { productCutout, productImage } from '#lib/images.ts';
 	import { reducedMotion } from '#lib/motion.ts';
 
 	/**
@@ -87,18 +87,18 @@
 	{#if open}
 		<div
 			id="mega-menu"
-			class="absolute top-full right-0 left-0 z-40 border-t border-line bg-white shadow-[var(--shadow-pop)]"
-			transition:fly={{ y: -6, duration: reducedMotion() ? 0 : 180 }}
+			class="mega absolute top-[calc(100%+10px)] right-0 left-0 z-40 overflow-hidden rounded-[22px] bg-white"
+			transition:fly={{ y: -10, duration: reducedMotion() ? 0 : 220 }}
 		>
-			<nav aria-label="Каталог товарів" class="wrap grid min-h-[380px] grid-cols-[260px_1fr] gap-0">
-				<ul class="border-r border-line py-4 pr-4">
+			<nav aria-label="Каталог товарів" class="grid min-h-[400px] grid-cols-[280px_1fr] gap-0">
+				<ul class="bg-paper/60 p-3">
 					{#each nav as c (c.slug)}
 						<li>
 							<a
 								href={resolve('/[category=category]', { category: c.slug })}
 								class={[
-									'flex h-11 items-center justify-between rounded-[var(--radius-xs)] px-3 text-[15px] transition-colors',
-									active === c.slug ? 'bg-paper text-ink' : 'text-graphite hover:text-ink'
+									'flex h-12 items-center justify-between rounded-sm px-4 text-[16px] font-medium transition-colors',
+									active === c.slug ? 'bg-white text-ink shadow-sm' : 'text-graphite hover:text-ink'
 								]}
 								aria-current={active === c.slug ? 'true' : undefined}
 								onpointerenter={() => (active = c.slug)}
@@ -109,10 +109,10 @@
 							</a>
 						</li>
 					{/each}
-					<li class="mt-3 border-t border-line pt-3">
+					<li class="mt-2">
 						<a
 							href={resolve('/brand')}
-							class="flex h-11 items-center px-3 text-[15px] text-graphite hover:text-ink"
+							class="flex h-12 items-center px-4 text-[15px] text-graphite hover:text-ink"
 							>Усі бренди</a
 						>
 					</li>
@@ -121,12 +121,12 @@
 				<div class="relative overflow-hidden">
 					{#key active}
 						<div
-							class="grid h-full grid-cols-[1fr_1fr_280px] gap-8 py-6 pl-8"
+							class="grid h-full grid-cols-[1fr_1fr_300px] gap-8 p-4 pl-10"
 							in:fly={{ x: 10, duration: reducedMotion() ? 0 : 220, delay: 60 }}
 							out:fade={{ duration: 80 }}
 						>
 							<div>
-								<p class="eyebrow">Розділи</p>
+								<p class="pt-4 text-sm text-mute">Розділи</p>
 								<ul class="mt-3 grid gap-1">
 									{#each current.subs as s (s.slug)}
 										<li>
@@ -135,7 +135,8 @@
 													category: current.slug,
 													sub: s.slug
 												})}
-												class="wave-link py-1.5 text-[15px] hover:text-blue">{s.name}</a
+												class="wave-link py-1.5 text-[17px] font-medium tracking-[-0.01em] hover:text-blue"
+												>{s.name}</a
 											>
 										</li>
 									{/each}
@@ -149,7 +150,7 @@
 								</a>
 							</div>
 							<div>
-								<p class="eyebrow">Популярні бренди</p>
+								<p class="pt-4 text-sm text-mute">Бренди</p>
 								<ul class="mt-3 grid gap-1">
 									{#each brandsIn as [slug, name] (slug)}
 										<li>
@@ -164,17 +165,30 @@
 							{#if promo}
 								<a
 									href={resolve('/product/[slug]', { slug: promo.slug })}
-									class="group flex flex-col bg-paper p-4 transition-colors hover:bg-blue-soft"
+									class="group stage relative flex flex-col justify-end overflow-hidden rounded-lg p-5"
 								>
-									<span class="eyebrow">Обирають найчастіше</span>
-									<enhanced:img
-										src={productImage(promo.image)}
-										alt={promo.alt}
-										sizes="248px"
-										class="my-3 aspect-[4/3] w-full object-cover mix-blend-multiply"
-									/>
-									<span class="text-[15px] font-medium group-hover:text-blue">{promo.name}</span>
-									<span class="mono mt-1 text-sm">{formatPrice(promo.price)}</span>
+									<span class="absolute top-5 left-5 text-sm text-graphite"
+										>Обирають найчастіше</span
+									>
+									{#if productCutout(promo.slug)}
+										<enhanced:img
+											src={productCutout(promo.slug)!}
+											alt={promo.alt}
+											sizes="220px"
+											class="cutout promo-img mx-auto mt-12 mb-4 aspect-square w-[72%] object-contain"
+										/>
+									{:else}
+										<enhanced:img
+											src={productImage(promo.image)}
+											alt={promo.alt}
+											sizes="260px"
+											class="mt-12 mb-4 aspect-[4/3] w-full rounded-sm object-cover"
+										/>
+									{/if}
+									<span class="relative text-[17px] font-medium group-hover:text-blue"
+										>{promo.name}</span
+									>
+									<span class="mono relative mt-1 text-sm">{formatPrice(promo.price)}</span>
 								</a>
 							{/if}
 						</div>
@@ -184,3 +198,17 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+	.mega {
+		box-shadow:
+			0 0 0 1px rgb(8 9 12 / 0.05),
+			0 32px 64px -32px rgb(8 9 12 / 0.45);
+	}
+	.promo-img {
+		transition: transform 0.6s var(--ease-out-soft);
+	}
+	.group:hover .promo-img {
+		transform: translateY(-6px) rotate(-2deg) scale(1.04);
+	}
+</style>

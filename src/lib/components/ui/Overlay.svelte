@@ -100,12 +100,12 @@
 		class="fixed inset-0 z-50 flex {side === 'center'
 			? 'items-end justify-center sm:items-center sm:p-6'
 			: side === 'right'
-				? 'justify-end'
-				: 'justify-start'}"
+				? 'justify-end p-2 sm:p-3'
+				: 'justify-start p-2 sm:p-3'}"
 	>
 		<button
 			type="button"
-			class="absolute inset-0 cursor-default bg-ink/40"
+			class="absolute inset-0 cursor-default bg-ink/35 backdrop-blur-[3px]"
 			tabindex="-1"
 			aria-label={closeLabel}
 			onclick={() => (open = false)}
@@ -119,8 +119,8 @@
 			aria-labelledby={labelledby}
 			tabindex="-1"
 			class="relative flex max-h-full w-full flex-col bg-white outline-none {side === 'center'
-				? `${width} max-h-[92svh] sm:rounded-[var(--radius-sm)]`
-				: `h-full ${width}`}"
+				? `${width} max-h-[92svh] overflow-hidden rounded-t-[24px] sm:rounded-[24px]`
+				: `h-full ${width} overflow-hidden rounded-[24px]`}"
 			transition:slide
 		>
 			<button

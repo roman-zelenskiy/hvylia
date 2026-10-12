@@ -21,7 +21,7 @@
 
 <div class="wrap pt-6">
 	<Breadcrumbs items={[{ href: '/', label: 'Головна' }, { label: 'Пошук' }]} />
-	<h1 class="h-display mt-6 border-b border-line pb-8 text-[clamp(2rem,4.4vw,3.5rem)]">
+	<h1 class="h-display head-in mt-6 pb-4 text-[clamp(2.4rem,5.6vw,4.75rem)]">
 		{#if q}Результати за «{q}»{:else}Пошук по каталогу{/if}
 	</h1>
 	<div class="mt-6">
