@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
+	import { t } from '#lib/ui.ts';
+	import { lang, lhref, rememberLang, switchHref } from '#lib/lang.ts';
+	import { page } from '$app/state';
 	import { Heart, Menu, Scale, Search, ShoppingBag } from '@lucide/svelte';
 	import { cart, compare, wishlist } from '#lib/stores/shop.svelte.ts';
 	import Logo from '#lib/components/ui/Logo.svelte';
@@ -8,6 +10,7 @@
 	import MobileMenu from './MobileMenu.svelte';
 	import SearchBox from './SearchBox.svelte';
 
+	const other = lang === 'en' ? 'uk' : 'en';
 	let mobileMenu = $state(false);
 	let mobileSearch = $state(false);
 	let scrolled = $state(false);
@@ -26,13 +29,13 @@
 			<button
 				type="button"
 				class="icon-btn lg:hidden"
-				aria-label="Меню"
+				aria-label={t.header.menu}
 				aria-expanded={mobileMenu}
 				onclick={() => (mobileMenu = true)}
 			>
 				<Menu size={20} />
 			</button>
-			<a href={resolve('/')} class="shrink-0 rounded-full" aria-label="«Хвиля» — на головну">
+			<a href={lhref('/')} class="shrink-0 rounded-full" aria-label={t.header.home}>
 				<Logo />
 			</a>
 			<div class="hidden lg:block"><MegaMenu /></div>
@@ -44,26 +47,39 @@
 				<button
 					type="button"
 					class="icon-btn !h-11 !w-11 md:hidden"
-					aria-label="Пошук"
+					aria-label={t.header.search}
 					aria-expanded={mobileSearch}
 					onclick={() => (mobileSearch = !mobileSearch)}
 				>
 					<Search size={20} />
 				</button>
+				<a
+					href={switchHref(page.url.pathname, other)}
+					hreflang={other}
+					lang={other}
+					data-sveltekit-reload
+					aria-label={t.header.switchLabel}
+					class="icon-btn mono !w-auto px-3 text-[13px] font-medium"
+					onclick={(e) => {
+						rememberLang(other);
+						// фільтри й пошук (?q=…) переносимо на іншу мову
+						e.currentTarget.href += location.search;
+					}}>{other === 'en' ? 'EN' : 'UA'}</a
+				>
 				<span class="hidden sm:contents">
 					<CountIcon
-						href={resolve('/compare')}
-						label="Порівняння"
+						href={lhref('/compare')}
+						label={t.header.compare}
 						count={compare.ready ? compare.items.length : 0}><Scale size={20} /></CountIcon
 					>
 				</span>
 				<CountIcon
-					href={resolve('/wishlist')}
-					label="Обране"
+					href={lhref('/wishlist')}
+					label={t.header.wishlist}
 					count={wishlist.ready ? wishlist.items.length : 0}><Heart size={20} /></CountIcon
 				>
 				<CountIcon
-					label="Кошик"
+					label={t.header.cart}
 					count={cart.ready ? cart.count : 0}
 					pulses={cart.pulses}
 					onclick={() => (cart.drawer = true)}

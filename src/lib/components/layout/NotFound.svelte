@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
+	import { t } from '#lib/ui.ts';
+	import { lhref } from '#lib/lang.ts';
 	import { page } from '$app/state';
 	import SearchBox from '#lib/components/layout/SearchBox.svelte';
 
@@ -13,7 +14,7 @@
 </script>
 
 <svelte:head>
-	<title>{notFound ? 'Сторінку не знайдено' : 'Помилка'} | Хвиля</title>
+	<title>{notFound ? t.nf.title : t.nf.error} {t.brandSuffix}</title>
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
@@ -35,20 +36,18 @@
 	</svg>
 	<p class="mono mt-8 text-sm text-blue">{status}</p>
 	<h1 class="h-display mt-3 text-[clamp(2rem,5vw,3.5rem)]">
-		{notFound ? 'Тут тиша' : 'Щось пішло не так'}
+		{notFound ? t.nf.h1 : t.nf.h1Error}
 	</h1>
 	<p class="mx-auto mt-4 max-w-md text-graphite">
-		{notFound
-			? 'Такої сторінки немає — можливо, товар зняли з продажу або посилання застаріло. Спробуйте пошук:'
-			: message}
+		{notFound ? t.nf.text : message}
 	</p>
 	<div class="mx-auto mt-8 max-w-lg text-left">
-		<SearchBox id="search-404" label="Пошук на сторінці помилки" />
+		<SearchBox id="search-404" label={t.search.errorPage} />
 	</div>
 	<ul class="mt-8 flex flex-wrap justify-center gap-2">
 		{#each nav as c (c.slug)}<li>
-				<a href={resolve('/[category=category]', { category: c.slug })} class="chip">{c.name}</a>
+				<a href={lhref('/[category=category]', { category: c.slug })} class="chip">{c.name}</a>
 			</li>{/each}
 	</ul>
-	<a href={resolve('/')} class="btn btn-primary btn-md mt-10">На головну</a>
+	<a href={lhref('/')} class="btn btn-primary btn-md mt-10">{t.nf.home}</a>
 </div>

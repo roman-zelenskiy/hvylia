@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import { formatPrice } from '#lib/catalog/format.ts';
 	import { FREE_SHIPPING_FROM } from '#lib/data/site.ts';
 
@@ -11,19 +12,19 @@
 <div class="bg-paper p-3">
 	<p class="text-[13px]">
 		{#if left > 0}
-			Ще <b class="mono font-medium">{formatPrice(left)}</b> до безкоштовної доставки
+			{t.ship.more} <b class="mono font-medium">{formatPrice(left)}</b> {t.ship.left}
 		{:else}
-			<b class="font-medium text-ok">Доставка безкоштовна</b>
+			<b class="font-medium text-ok">{t.ship.free}</b>
 		{/if}
 	</p>
 	<div
 		class="relative mt-2 h-1.5 overflow-hidden bg-line"
 		role="progressbar"
-		aria-label="До безкоштовної доставки"
+		aria-label={t.ship.aria}
 		aria-valuemin={0}
 		aria-valuemax={FREE_SHIPPING_FROM}
 		aria-valuenow={Math.min(total, FREE_SHIPPING_FROM)}
-		aria-valuetext={left > 0 ? `Залишилось ${formatPrice(left)}` : 'Безкоштовна доставка'}
+		aria-valuetext={left > 0 ? t.ship.leftText(formatPrice(left)) : t.ship.freeText}
 	>
 		<div
 			class="absolute inset-0 origin-left bg-blue transition-transform duration-500 ease-[var(--ease-precise)]"

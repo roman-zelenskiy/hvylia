@@ -1,7 +1,8 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import { browser } from '$app/env';
 	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
+	import { lhref } from '#lib/lang.ts';
 	import { page } from '$app/state';
 	import { LayoutGrid, List, SlidersHorizontal, X } from '@lucide/svelte';
 	import { onMount } from 'svelte';
@@ -81,7 +82,7 @@
 			.then((r) => {
 				if (my !== seq) return;
 				fetched = r;
-				announce(r.total ? `Знайдено ${goods(r.total)}` : 'За цими фільтрами нічого не знайдено');
+				announce(r.total ? t.catalog.found(goods(r.total)) : t.catalog.nothingFiltered);
 			})
 			.catch((e: Error) => my === seq && (error = e.message))
 			.finally(() => my === seq && (loading = false));
@@ -90,7 +91,7 @@
 	const href = (f: Filters) => `${path}${serializeFilters(f)}`;
 	// звичайна навігація без скидання скролу й фокусу: load не залежить від query, тож дані не перезапитуються;
 	// історія оновлюється — «назад/вперед» працюють
-	const apply = (next: Filters) => goto(resolve(href(next) as '/'), { reset: false });
+	const apply = (next: Filters) => goto(lhref(href(next) as '/'), { reset: false });
 	const reset = () => apply({ ...emptyFilters, sort: filters.sort });
 
 	type Chip = { label: string; next: Filters };
@@ -124,9 +125,9 @@
 				label: `${f.priceMin ?? result.priceBounds.min}–${f.priceMax ?? result.priceBounds.max} ₴`,
 				next: { ...f, priceMin: null, priceMax: null }
 			});
-		if (f.anc) out.push({ label: 'З шумозаглушенням', next: { ...f, anc: false } });
-		if (f.inStock) out.push({ label: 'В наявності', next: { ...f, inStock: false } });
-		if (f.rating) out.push({ label: `Рейтинг від ${f.rating}`, next: { ...f, rating: 0 } });
+		if (f.anc) out.push({ label: t.catalog.anc, next: { ...f, anc: false } });
+		if (f.inStock) out.push({ label: t.catalog.inStock, next: { ...f, inStock: false } });
+		if (f.rating) out.push({ label: t.catalog.ratingFrom(f.rating), next: { ...f, rating: 0 } });
 		if (f.q) out.push({ label: `«${f.q}»`, next: { ...f, q: '' } });
 		return out.map((c) => ({ ...c, next: { ...c.next, page: 1, more: 1 } }));
 	});
@@ -136,7 +137,7 @@
 </script>
 
 <div class="lg:grid lg:grid-cols-[260px_1fr] lg:gap-10">
-	<aside class="hidden lg:block" aria-label="Фільтри">
+	<aside class="hidden lg:block" aria-label={t.catalog.filters}>
 		<div class="sticky top-[150px] max-h-[calc(100svh-170px)] overflow-y-auto pr-2">
 			<FilterPanel {filters} {result} {show} onchange={apply} />
 		</div>
@@ -150,18 +151,18 @@
 				onclick={() => (mobileFilters = true)}
 				aria-haspopup="dialog"
 			>
-				<SlidersHorizontal size={16} /> Фільтри{#if chips.length}<span class="mono text-blue"
-						>· {chips.length}</span
+				<SlidersHorizontal size={16} />
+				{t.catalog.filters}{#if chips.length}<span class="mono text-blue">· {chips.length}</span
 					>{/if}
 			</button>
 			<p class="mono text-sm text-graphite" aria-live="polite">
-				{loading ? 'Шукаємо…' : goods(result.total)}
+				{loading ? t.catalog.searching : goods(result.total)}
 			</p>
 			<div class="ml-auto flex items-center gap-2">
 				<div class="w-52">
 					<Select
 						id="sort"
-						label="Сортування"
+						label={t.catalog.sort}
 						hideLabel
 						value={filters.sort}
 						options={sorts.map((s) => ({ value: s.id, label: s.label }))}
@@ -171,13 +172,13 @@
 				<div
 					class="hidden rounded-[var(--radius-sm)] shadow-[inset_0_0_0_1px_var(--color-line-2)] sm:flex"
 					role="group"
-					aria-label="Вигляд списку"
+					aria-label={t.catalog.view}
 				>
 					<button
 						type="button"
 						class="icon-btn"
 						aria-pressed={view === 'grid'}
-						aria-label="Сітка"
+						aria-label={t.catalog.grid}
 						onclick={() => ((view = 'grid'), storage.write('hvylia:view', 'grid'))}
 						><LayoutGrid size={17} /></button
 					>
@@ -185,7 +186,7 @@
 						type="button"
 						class="icon-btn"
 						aria-pressed={view === 'list'}
-						aria-label="Список"
+						aria-label={t.catalog.list}
 						onclick={() => ((view = 'list'), storage.write('hvylia:view', 'list'))}
 						><List size={17} /></button
 					>
@@ -197,29 +198,29 @@
 			<div class="flex flex-wrap items-center gap-2 pt-4">
 				{#each chips as c (c.label)}
 					<a
-						href={resolve(href(c.next) as '/')}
+						href={lhref(href(c.next) as '/')}
 						data-sveltekit-reset="false"
 						class="chip is-active gap-1.5"
-						aria-label="Прибрати фільтр: {c.label}"
+						aria-label={t.catalog.removeFilter(c.label)}
 					>
 						{c.label}<X size={13} />
 					</a>
 				{/each}
 				<button type="button" class="ml-1 text-sm text-blue hover:text-blue-ink" onclick={reset}
-					>Скинути все</button
+					>{t.catalog.reset}</button
 				>
 			</div>
 		{/if}
 
-		<h2 class="sr-only">Товари</h2>
+		<h2 class="sr-only">{t.catalog.products}</h2>
 		{#if error}
 			<p class="mt-8 bg-alert-soft p-4 text-alert" role="alert">
-				Не вдалося завантажити товари: {error}. Спробуйте оновити сторінку.
+				{t.catalog.loadError(error)}
 			</p>
 		{:else if loading}
 			<ul
 				class="mt-6 grid gap-4 {view === 'grid' ? 'grid-cols-2 xl:grid-cols-3' : ''}"
-				aria-label="Завантаження товарів"
+				aria-label={t.catalog.loading}
 				aria-busy="true"
 			>
 				{#each Array.from({ length: Math.min(PER_PAGE, Math.max(3, result.items.length)) }, (_, i) => i) as i (i)}
@@ -246,7 +247,7 @@
 						class="btn btn-secondary btn-lg min-w-64"
 						onclick={() => apply({ ...filters, more: filters.more + 1 })}
 					>
-						Показати ще {Math.min(PER_PAGE, moreLeft)}
+						{t.catalog.showMore(Math.min(PER_PAGE, moreLeft))}
 					</button>
 				</div>
 			{/if}
@@ -254,17 +255,17 @@
 				<Pagination
 					page={result.page}
 					pages={result.pages}
-					href={(p) => resolve(href({ ...filters, page: p, more: 1 }) as '/')}
+					href={(p) => lhref(href({ ...filters, page: p, more: 1 }) as '/')}
 				/>
 			</div>
 		{:else}
 			<div class="mt-10 rounded-lg bg-white px-6 py-20 text-center">
-				<p class="text-lg font-medium">Нічого не знайдено</p>
+				<p class="text-lg font-medium">{t.catalog.emptyTitle}</p>
 				<p class="mx-auto mt-2 max-w-sm text-graphite">
-					Спробуйте прибрати частину фільтрів або розширити діапазон ціни.
+					{t.catalog.emptyText}
 				</p>
 				<button type="button" class="btn btn-primary btn-md mt-6" onclick={reset}
-					>Скинути фільтри</button
+					>{t.catalog.resetFilters}</button
 				>
 			</div>
 		{/if}
@@ -276,23 +277,25 @@
 	labelledby="mobile-filters-title"
 	side="left"
 	width="max-w-[380px]"
-	closeLabel="Закрити фільтри"
+	closeLabel={t.catalog.closeFilters}
 >
 	<div class="flex h-16 shrink-0 items-center border-b border-line px-5">
-		<h2 id="mobile-filters-title" class="text-lg font-semibold">Фільтри</h2>
+		<h2 id="mobile-filters-title" class="text-lg font-semibold">{t.catalog.filters}</h2>
 	</div>
 	<div class="flex-1 overflow-y-auto px-5">
 		<FilterPanel {filters} {result} {show} onchange={apply} />
 	</div>
 	<div class="grid shrink-0 grid-cols-2 gap-2 border-t border-line p-4">
-		<button type="button" class="btn btn-secondary btn-lg" onclick={reset}>Скинути</button>
+		<button type="button" class="btn btn-secondary btn-lg" onclick={reset}
+			>{t.catalog.resetShort}</button
+		>
 		<button
 			type="button"
 			class="btn btn-primary btn-lg"
 			onclick={() => (mobileFilters = false)}
 			data-autofocus
 		>
-			Показати {loading ? '…' : result.total}
+			{t.catalog.show(loading ? '…' : String(result.total))}
 		</button>
 	</div>
 </Overlay>

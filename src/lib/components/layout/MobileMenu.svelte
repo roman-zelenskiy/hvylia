@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
+	import { t } from '#lib/ui.ts';
+	import { lhref } from '#lib/lang.ts';
 	import { page } from '$app/state';
 	import { ArrowLeft, ChevronRight, Phone } from '@lucide/svelte';
 	import { fly } from 'svelte/transition';
@@ -27,13 +28,7 @@
 		if (!open) level = null;
 	});
 
-	const info = [
-		{ href: '/dostavka-i-oplata', label: 'Доставка і оплата' },
-		{ href: '/harantiia-ta-povernennia', label: 'Гарантія та повернення' },
-		{ href: '/pro-nas', label: 'Про нас' },
-		{ href: '/kontakty', label: 'Контакти' },
-		{ href: '/faq', label: 'Питання та відповіді' }
-	] as const;
+	const info = t.infoLinks.slice(0, 5);
 </script>
 
 <Overlay
@@ -41,10 +36,10 @@
 	labelledby="mobile-menu-title"
 	side="left"
 	width="max-w-[420px]"
-	closeLabel="Закрити меню"
+	closeLabel={t.menu.close}
 >
 	<div class="flex h-16 shrink-0 items-center border-b border-line px-4">
-		<h2 id="mobile-menu-title" class="sr-only">Меню</h2>
+		<h2 id="mobile-menu-title" class="sr-only">{t.menu.title}</h2>
 		<Logo />
 	</div>
 	<div class="relative flex-1 overflow-x-hidden overflow-y-auto">
@@ -61,20 +56,21 @@
 						data-autofocus
 						onclick={() => ((dir = -1), (level = null))}
 					>
-						<ArrowLeft size={16} /> Усі категорії
+						<ArrowLeft size={16} />
+						{t.menu.allCats}
 					</button>
 					<p class="mb-2 text-xl font-semibold tracking-tight">{cat.name}</p>
 					<ul class="divide-y divide-line border-y border-line">
 						<li>
 							<a
-								href={resolve('/[category=category]', { category: cat.slug })}
-								class="flex h-12 items-center text-blue">Усі {cat.name.toLowerCase()}</a
+								href={lhref('/[category=category]', { category: cat.slug })}
+								class="flex h-12 items-center text-blue">{t.menu.all(cat.name)}</a
 							>
 						</li>
 						{#each cat.subs as s (s.slug)}
 							<li>
 								<a
-									href={resolve('/[category=category]/[sub=sub]', {
+									href={lhref('/[category=category]/[sub=sub]', {
 										category: cat.slug,
 										sub: s.slug
 									})}
@@ -85,7 +81,7 @@
 						{/each}
 					</ul>
 				{:else}
-					<p class="eyebrow mb-2">Каталог</p>
+					<p class="eyebrow mb-2">{t.menu.catalog}</p>
 					<ul class="divide-y divide-line border-y border-line">
 						{#each nav as c, i (c.slug)}
 							<li>
@@ -100,18 +96,17 @@
 							</li>
 						{/each}
 						<li>
-							<a href={resolve('/brand')} class="flex h-12 items-center text-[16px] hover:text-blue"
-								>Бренди</a
+							<a href={lhref('/brand')} class="flex h-12 items-center text-[16px] hover:text-blue"
+								>{t.menu.brands}</a
 							>
 						</li>
 					</ul>
-					<p class="eyebrow mt-6 mb-2">Покупцям</p>
+					<p class="eyebrow mt-6 mb-2">{t.menu.buyers}</p>
 					<ul class="grid">
 						{#each info as l (l.href)}
 							<li>
-								<a
-									href={resolve(l.href)}
-									class="flex h-10 items-center text-graphite hover:text-ink">{l.label}</a
+								<a href={lhref(l.href)} class="flex h-10 items-center text-graphite hover:text-ink"
+									>{l.label}</a
 								>
 							</li>
 						{/each}

@@ -1,3 +1,4 @@
+import { onLang } from '#lib/lang-core.ts';
 import { brandBySlug, brands } from '#lib/data/brands.ts';
 import { products } from '#lib/data/products.ts';
 import { ratingOf } from '#lib/data/reviews.ts';
@@ -33,11 +34,16 @@ export function toSummary(p: Product): Summary {
 	};
 }
 
-export const summaries: Summary[] = products.map(toSummary);
-export const summaryBySlug = new Map(summaries.map((s) => [s.slug, s]));
-export const brandNames: Record<string, string> = Object.fromEntries(
-	brands.map((b) => [b.slug, b.name])
-);
+/** Перебудовуються при зміні мови (назви, описи, ім’я бренду) — див. #lib/lang.ts */
+export let summaries: Summary[] = [];
+export let summaryBySlug = new Map<string, Summary>();
+export let brandNames: Record<string, string> = {};
+
+onLang(() => {
+	summaries = products.map(toSummary);
+	summaryBySlug = new Map(summaries.map((s) => [s.slug, s]));
+	brandNames = Object.fromEntries(brands.map((b) => [b.slug, b.name]));
+});
 
 export const pick = (slugs: string[]) =>
 	slugs.map((s) => summaryBySlug.get(s)).filter((s): s is Summary => !!s);

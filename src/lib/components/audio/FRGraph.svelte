@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import { onMount, untrack } from 'svelte';
 	import { freqs, fmtDb, fmtHz, pathOf, xOf, yOf } from '#lib/audio/fr.ts';
 	import { reducedMotion } from '#lib/motion.ts';
@@ -166,9 +167,9 @@
 		{#if hover !== null}
 			<span>{fmtHz(freqs[hover])}</span><span class="val">{fmtDb(current.values[hover])}</span>
 		{:else if progress < 1}
-			<span>{fmtHz(sweepF)}</span><span class="val">вимірюємо</span>
+			<span>{fmtHz(sweepF)}</span><span class="val">{t.fr.measuring}</span>
 		{:else}
-			<span>{current.label}</span><span class="val">20 Гц – 20 кГц</span>
+			<span>{current.label}</span><span class="val">{t.fr.range}</span>
 		{/if}
 	</figcaption>
 </figure>

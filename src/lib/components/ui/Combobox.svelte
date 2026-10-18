@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import { ChevronDown } from '@lucide/svelte';
 	import { fly } from 'svelte/transition';
 
@@ -13,7 +14,7 @@
 		placeholder = '',
 		error = '',
 		disabled = false,
-		empty = 'Нічого не знайдено',
+		empty = t.nothing,
 		onselect
 	}: {
 		id: string;

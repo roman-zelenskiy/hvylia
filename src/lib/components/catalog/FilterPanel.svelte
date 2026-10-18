@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import { ChevronDown } from '@lucide/svelte';
 	import type { Snippet } from 'svelte';
 	import type { FilterKey, Filters, QueryResult } from '#lib/catalog/query.ts';
@@ -101,7 +102,7 @@
 
 {#snippet ancBody()}
 	<Checkbox checked={filters.anc} count={result.facets.anc} onchange={(v) => set({ anc: v })}
-		>Активне шумозаглушення</Checkbox
+		>{t.filter.anc}</Checkbox
 	>
 {/snippet}
 
@@ -129,14 +130,14 @@
 	<Checkbox
 		checked={filters.inStock}
 		count={result.facets.inStock}
-		onchange={(v) => set({ inStock: v })}>Лише в наявності</Checkbox
+		onchange={(v) => set({ inStock: v })}>{t.filter.inStock}</Checkbox
 	>
 {/snippet}
 
 {#snippet ratingBody()}
 	<fieldset>
-		<legend class="sr-only">Рейтинг</legend>
-		{#each [{ value: 0, label: 'Будь-який', count: undefined }, ...result.facets.rating.map( (r) => ({ value: r.value, label: `від ${r.value.toFixed(1)} ★`, count: r.count }) )] as r (r.value)}
+		<legend class="sr-only">{t.filter.rating}</legend>
+		{#each [{ value: 0, label: t.filter.any, count: undefined }, ...result.facets.rating.map( (r) => ({ value: r.value, label: t.filter.from(r.value.toFixed(1)), count: r.count }) )] as r (r.value)}
 			<label class="check">
 				<input
 					type="radio"
@@ -154,15 +155,15 @@
 {/snippet}
 
 <div>
-	<h2 class="sr-only">Фільтри</h2>
-	{#if show.includes('price')}{@render section('price', 'Ціна, ₴', priceBody)}{/if}
-	{#if show.includes('brand')}{@render section('brand', 'Бренд', brandBody)}{/if}
-	{#if show.includes('type')}{@render section('type', 'Тип', typeBody)}{/if}
-	{#if show.includes('conn')}{@render section('conn', 'Підключення', connBody)}{/if}
-	{#if show.includes('anc')}{@render section('anc', 'Шумозаглушення', ancBody)}{/if}
-	{#if show.includes('color')}{@render section('color', 'Колір', colorBody)}{/if}
-	{#if show.includes('stock')}{@render section('stock', 'Наявність', stockBody)}{/if}
-	{#if show.includes('rating')}{@render section('rating', 'Рейтинг', ratingBody)}{/if}
+	<h2 class="sr-only">{t.catalog.filters}</h2>
+	{#if show.includes('price')}{@render section('price', t.filter.price, priceBody)}{/if}
+	{#if show.includes('brand')}{@render section('brand', t.filter.brand, brandBody)}{/if}
+	{#if show.includes('type')}{@render section('type', t.filter.type, typeBody)}{/if}
+	{#if show.includes('conn')}{@render section('conn', t.filter.conn, connBody)}{/if}
+	{#if show.includes('anc')}{@render section('anc', t.filter.ancTitle, ancBody)}{/if}
+	{#if show.includes('color')}{@render section('color', t.filter.color, colorBody)}{/if}
+	{#if show.includes('stock')}{@render section('stock', t.filter.stock, stockBody)}{/if}
+	{#if show.includes('rating')}{@render section('rating', t.filter.rating, ratingBody)}{/if}
 </div>
 
 <style>

@@ -1,3 +1,4 @@
+import { onLang } from '#lib/lang-core.ts';
 /**
  * Каталожний «рушій»: фільтри, фасети з лічильниками, сортування, пагінація.
  * Чистий модуль — однаково працює під час пререндеру (сервер) і в браузері (фільтри з URL).
@@ -30,7 +31,7 @@ export type Summary = {
 
 export type SortId = 'popular' | 'cheap' | 'expensive' | 'new' | 'rating';
 
-export const sorts: { id: SortId; label: string }[] = [
+const sortsUk: { id: SortId; label: string }[] = [
 	{ id: 'popular', label: 'Популярні' },
 	{ id: 'cheap', label: 'Спершу дешевші' },
 	{ id: 'expensive', label: 'Спершу дорожчі' },
@@ -38,7 +39,7 @@ export const sorts: { id: SortId; label: string }[] = [
 	{ id: 'rating', label: 'За рейтингом' }
 ];
 
-export const typeLabel: Record<string, string> = {
+const typeUk: Record<string, string> = {
 	tws: 'TWS',
 	'on-ear': 'Накладні',
 	'over-ear': 'Повнорозмірні',
@@ -58,13 +59,57 @@ export const typeLabel: Record<string, string> = {
 	stand: 'Підставка'
 };
 
-export const connectionLabel: Record<string, string> = {
+const connUk: Record<string, string> = {
 	bluetooth: 'Bluetooth',
 	wired: 'Дротове',
 	wifi: 'Wi-Fi',
 	usb: 'USB',
 	radio: 'Радіо 2,4 ГГц'
 };
+
+const sortsEn: { id: SortId; label: string }[] = [
+	{ id: 'popular', label: 'Popular' },
+	{ id: 'cheap', label: 'Price: low to high' },
+	{ id: 'expensive', label: 'Price: high to low' },
+	{ id: 'new', label: 'Newest' },
+	{ id: 'rating', label: 'Top rated' }
+];
+const typeEn: Record<string, string> = {
+	tws: 'TWS',
+	'on-ear': 'On-ear',
+	'over-ear': 'Over-ear',
+	'in-ear': 'In-ear',
+	gaming: 'Gaming headset',
+	portable: 'Portable',
+	bookshelf: 'Bookshelf',
+	soundbar: 'Soundbar',
+	smart: 'Smart',
+	turntable: 'Turntable',
+	record: 'Record',
+	care: 'Care',
+	amplifier: 'Amplifier',
+	dac: 'DAC',
+	cable: 'Cable',
+	pads: 'Ear pads',
+	stand: 'Stand'
+};
+const connEn: Record<string, string> = {
+	bluetooth: 'Bluetooth',
+	wired: 'Wired',
+	wifi: 'Wi-Fi',
+	usb: 'USB',
+	radio: '2.4 GHz radio'
+};
+
+/** Підписи мовою сторінки (живі прив’язки, див. #lib/lang.ts) */
+export let sorts = sortsUk;
+export let typeLabel = typeUk;
+export let connectionLabel = connUk;
+onLang((l) => {
+	sorts = l === 'en' ? sortsEn : sortsUk;
+	typeLabel = l === 'en' ? typeEn : typeUk;
+	connectionLabel = l === 'en' ? connEn : connUk;
+});
 
 export type Filters = {
 	q: string;

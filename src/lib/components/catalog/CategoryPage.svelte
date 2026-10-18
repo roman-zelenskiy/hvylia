@@ -1,6 +1,7 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import { browser } from '$app/env';
-	import { resolve } from '$app/paths';
+	import { lhref } from '#lib/lang.ts';
 	import { page } from '$app/state';
 	import {
 		hasActiveFilters,
@@ -78,7 +79,8 @@
 			<h1 class="h-display text-[clamp(2.4rem,5.6vw,4.75rem)]">{data.h1}</h1>
 			<p class="mt-5 max-w-xl text-[17px] text-graphite">{data.lead}</p>
 			<p class="mt-6 inline-flex h-9 items-center rounded-full bg-white px-4 text-sm">
-				<span class="mono mr-1.5 font-medium">{data.initial.total}</span> у розділі
+				<span class="mono mr-1.5 font-medium">{data.initial.total}</span>
+				{t.category.inSection}
 			</p>
 		</div>
 		{#if data.graphic}
@@ -101,12 +103,15 @@
 		{/if}
 	</div>
 	{#if data.subs.length}
-		<nav aria-label="Підрозділи" class="no-scrollbar -mx-4 overflow-x-auto px-4 md:mx-0 md:px-0">
+		<nav
+			aria-label={t.category.subs}
+			class="no-scrollbar -mx-4 overflow-x-auto px-4 md:mx-0 md:px-0"
+		>
 			<ul class="flex gap-2 py-4">
 				{#each data.subs as s (s.href)}
 					<li>
 						<a
-							href={resolve(s.href as '/')}
+							href={lhref(s.href as '/')}
 							class={['chip whitespace-nowrap', s.current && 'is-active']}
 							aria-current={s.current ? 'page' : undefined}>{s.label}</a
 						>
@@ -125,7 +130,7 @@
 			class="mt-24 grid gap-8 rounded-lg bg-white p-6 md:p-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-12"
 			aria-labelledby="seo-title"
 		>
-			<p class="text-graphite">Довідка</p>
+			<p class="text-graphite">{t.category.guide}</p>
 			<div class="max-w-3xl">
 				<h2 id="seo-title" class="h-section text-[clamp(1.8rem,3vw,2.6rem)]">
 					{data.seoText[0].title}
@@ -147,7 +152,7 @@
 						aria-expanded={expanded}
 						onclick={() => (expanded = !expanded)}
 					>
-						{expanded ? 'Згорнути' : 'Читати далі'}
+						{expanded ? t.category.collapse : t.category.readMore}
 					</button>
 				{/if}
 			</div>
@@ -159,7 +164,7 @@
 			class="mt-16 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-12"
 			aria-labelledby="faq-title"
 		>
-			<h2 id="faq-title" class="h-section text-[clamp(1.8rem,3vw,2.6rem)]">Питання й відповіді</h2>
+			<h2 id="faq-title" class="h-section text-[clamp(1.8rem,3vw,2.6rem)]">{t.category.faq}</h2>
 			<div class="max-w-3xl"><Accordion id="cat-faq" items={data.faq} /></div>
 		</section>
 	{/if}

@@ -41,7 +41,18 @@ export default defineConfig({
 			paths: { base, relative: false },
 			// увесь CSS (~10 КБ gzip) вбудовується в HTML: жодного блокуючого запиту перед першою відмальовкою
 			inlineStyleThreshold: Infinity,
-			prerender: { handleHttpError: 'fail', handleMissingId: 'fail', entries: ['*', '/404'] }
+			prerender: {
+				handleHttpError: 'fail',
+				handleMissingId: 'fail',
+				entries: [
+					'*',
+					'/404',
+					// сторінки без посилань у HTML (кошик, оформлення, пошук, замовлення) — для обох мов
+					...['uk', 'en'].flatMap((l) =>
+						['', '/cart', '/checkout', '/order', '/search'].map((p) => `/${l}${p}` as const)
+					)
+				]
+			}
 		})
 	]
 });

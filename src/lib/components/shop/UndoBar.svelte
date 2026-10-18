@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import { Undo2 } from '@lucide/svelte';
 	import { fly } from 'svelte/transition';
 	import { announce, cart } from '#lib/stores/shop.svelte.ts';
@@ -22,17 +23,18 @@
 		role="status"
 		transition:fly={{ y: 12, duration: 180 }}
 	>
-		<span class="flex-1">Товар видалено</span>
+		<span class="flex-1">{t.undo.removed}</span>
 		<button
 			type="button"
 			class="btn btn-sm bg-white text-ink hover:bg-paper"
 			onclick={() => {
 				cart.undo();
 				visible = false;
-				announce('Товар повернуто в кошик');
+				announce(t.undo.restored);
 			}}
 		>
-			<Undo2 size={15} /> Скасувати
+			<Undo2 size={15} />
+			{t.undo.undo}
 		</button>
 	</div>
 {/if}

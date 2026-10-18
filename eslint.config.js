@@ -36,6 +36,9 @@ export default defineConfig(
 	{
 		// Override or add rule settings here, such as:
 		// 'svelte/button-has-type': 'error'
-		rules: {}
+		rules: {
+			// посилання будуються через lhref() з #lib/lang.ts — він сам викликає resolve() і додає мовний сегмент
+			'svelte/no-navigation-without-resolve': 'off'
+		}
 	}
 );

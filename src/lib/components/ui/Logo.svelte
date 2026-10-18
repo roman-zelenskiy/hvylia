@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	/** Логотип: хвиля з дев’яти штрихів різної висоти + назва */
 	const bars = [5, 9, 14, 20, 24, 20, 14, 9, 5];
 </script>
@@ -16,5 +17,5 @@
 			/>
 		{/each}
 	</svg>
-	<span class="text-[19px] font-semibold tracking-[-0.03em]">Хвиля</span>
+	<span class="text-[19px] font-semibold tracking-[-0.03em]">{t.brand}</span>
 </span>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import { ChevronLeft, ChevronRight, Expand } from '@lucide/svelte';
 	import { fade } from 'svelte/transition';
 	import type { Picture } from 'vite-imagetools';
@@ -34,7 +35,7 @@
 
 	const frame = $derived(frames[index] ?? frames[0]);
 	const go = (d: number) => (index = (index + d + frames.length) % frames.length);
-	const altFor = (i: number) => (i === 0 ? alt : `${name} — фото ${i + 1} з ${frames.length}`);
+	const altFor = (i: number) => (i === 0 ? alt : t.gallery.alt(name, i + 1, frames.length));
 	const fine = () => matchMedia('(hover: hover) and (pointer: fine)').matches;
 
 	function swipeStart(e: PointerEvent) {
@@ -49,7 +50,7 @@
 <div class="grid gap-3 md:grid-cols-[76px_1fr]">
 	<ul
 		class="no-scrollbar order-2 flex gap-2 overflow-x-auto p-0.5 md:order-1 md:flex-col"
-		aria-label="Фото товару"
+		aria-label={t.gallery.photos}
 	>
 		{#each frames as f, i (i)}
 			<li>
@@ -60,7 +61,7 @@
 						f.cut ? 'stage' : 'bg-white',
 						i === index && 'is-current'
 					]}
-					aria-label="Фото {i + 1} з {frames.length}"
+					aria-label={t.gallery.photo(i + 1, frames.length)}
 					aria-current={i === index ? 'true' : undefined}
 					onclick={() => (index = i)}
 				>
@@ -86,7 +87,7 @@
 		<button
 			type="button"
 			class="group absolute inset-0 block h-full w-full cursor-zoom-in overflow-hidden"
-			aria-label="Відкрити фото на весь екран"
+			aria-label={t.gallery.fullscreen}
 			onclick={() => (full = true)}
 			onpointerenter={() => fine() && (zoom = true)}
 			onpointerleave={() => (zoom = false)}
@@ -146,16 +147,16 @@
 	bind:open={full}
 	labelledby="gallery-title"
 	width="max-w-[min(92vw,1100px)]"
-	closeLabel="Закрити перегляд"
+	closeLabel={t.gallery.close}
 >
-	<h2 id="gallery-title" class="sr-only">{name}: фото {index + 1} з {frames.length}</h2>
+	<h2 id="gallery-title" class="sr-only">{t.gallery.title(name, index + 1, frames.length)}</h2>
 	<div
 		class={[
 			'relative aspect-square max-h-[86svh] w-full touch-pan-y',
 			frame.cut ? 'stage' : 'bg-white'
 		]}
 		role="group"
-		aria-roledescription="галерея"
+		aria-roledescription={t.gallery.role}
 		onpointerdown={swipeStart}
 		onpointerup={swipeEnd}
 	>
@@ -175,7 +176,7 @@
 		<button
 			type="button"
 			class="icon-btn absolute top-1/2 left-3 z-10 -translate-y-1/2 bg-white shadow-[var(--shadow-pop)]"
-			aria-label="Попереднє фото"
+			aria-label={t.gallery.prev}
 			onclick={() => go(-1)}
 			data-autofocus
 		>
@@ -184,7 +185,7 @@
 		<button
 			type="button"
 			class="icon-btn absolute top-1/2 right-3 z-10 -translate-y-1/2 bg-white shadow-[var(--shadow-pop)]"
-			aria-label="Наступне фото"
+			aria-label={t.gallery.next}
 			onclick={() => go(1)}
 		>
 			<ChevronRight size={20} />

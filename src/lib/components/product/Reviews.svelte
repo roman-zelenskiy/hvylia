@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import { BadgeCheck } from '@lucide/svelte';
 	import { flip } from 'svelte/animate';
 	import { fade } from 'svelte/transition';
@@ -28,9 +29,9 @@
 	let touched = $state(false);
 	let status = $state<'idle' | 'sending' | 'done'>('idle');
 	const errors = $derived({
-		name: form.name.trim().length < 2 ? 'Вкажіть ім’я' : '',
-		rating: form.rating ? '' : 'Поставте оцінку',
-		text: form.text.trim().length < 20 ? 'Розкажіть трохи більше — хоча б 20 символів' : ''
+		name: form.name.trim().length < 2 ? t.reviews.errName : '',
+		rating: form.rating ? '' : t.reviews.errRating,
+		text: form.text.trim().length < 20 ? t.reviews.errText : ''
 	});
 	async function submit(e: SubmitEvent) {
 		e.preventDefault();
@@ -47,9 +48,9 @@
 	<div>
 		<p class="mono text-5xl font-medium tracking-tight">{rating.value.toFixed(1)}</p>
 		<div class="mt-2"><Rating value={rating.value} showValue={false} size={16} /></div>
-		<p class="mt-1 text-sm text-graphite">{rating.count} відгуків</p>
+		<p class="mt-1 text-sm text-graphite">{t.reviews.count(rating.count)}</p>
 		<fieldset class="mt-6">
-			<legend class="sr-only">Фільтр за оцінкою</legend>
+			<legend class="sr-only">{t.reviews.filter}</legend>
 			<ul class="grid gap-1.5">
 				{#each dist as d (d.s)}
 					<li>
@@ -82,7 +83,7 @@
 			class="mt-6"
 			onclick={() => (formOpen = !formOpen)}
 			aria-expanded={formOpen}
-			aria-controls="review-form">Написати відгук</Button
+			aria-controls="review-form">{t.reviews.write}</Button
 		>
 	</div>
 
@@ -96,13 +97,12 @@
 			>
 				{#if status === 'done'}
 					<p class="text-ok" role="status">
-						Дякуємо! Відгук на «{productName}» з’явиться після модерації (це демо — насправді він
-						нікуди не надсилається).
+						{t.reviews.thanks(productName)}
 					</p>
 				{:else}
-					<p class="font-medium">Ваш відгук про {productName}</p>
+					<p class="font-medium">{t.reviews.yours(productName)}</p>
 					<div>
-						<label for="rv-name" class="field-label">Ім’я</label>
+						<label for="rv-name" class="field-label">{t.reviews.name}</label>
 						<input
 							id="rv-name"
 							class="field"
@@ -113,7 +113,7 @@
 						{#if touched && errors.name}<p id="rv-name-e" class="field-error">{errors.name}</p>{/if}
 					</div>
 					<fieldset>
-						<legend class="field-label">Оцінка</legend>
+						<legend class="field-label">{t.reviews.rating}</legend>
 						<div class="flex gap-1" id="rv-rating" tabindex="-1">
 							{#each [1, 2, 3, 4, 5] as s (s)}
 								<label class="star">
@@ -130,14 +130,14 @@
 											fill={s <= form.rating ? 'var(--color-ink)' : 'var(--color-line-2)'}
 										/></svg
 									>
-									<span class="sr-only">{s} з 5</span>
+									<span class="sr-only">{t.reviews.of5(s)}</span>
 								</label>
 							{/each}
 						</div>
 						{#if touched && errors.rating}<p class="field-error">{errors.rating}</p>{/if}
 					</fieldset>
 					<div>
-						<label for="rv-text" class="field-label">Відгук</label>
+						<label for="rv-text" class="field-label">{t.reviews.text}</label>
 						<textarea
 							id="rv-text"
 							class="field"
@@ -146,7 +146,7 @@
 							aria-describedby={touched && errors.text ? 'rv-text-e' : undefined}></textarea>
 						{#if touched && errors.text}<p id="rv-text-e" class="field-error">{errors.text}</p>{/if}
 					</div>
-					<div><Button type="submit" loading={status === 'sending'}>Надіслати відгук</Button></div>
+					<div><Button type="submit" loading={status === 'sending'}>{t.reviews.send}</Button></div>
 				{/if}
 			</form>
 		{/if}
@@ -165,25 +165,25 @@
 					<p class="mt-1 text-[13px] text-graphite">
 						{r.author}, {r.city} · <time datetime={r.date}>{formatDate(r.date)}</time>
 						{#if r.verified}<span class="ml-2 inline-flex items-center gap-1 text-ok"
-								><BadgeCheck size={14} /> Підтверджена покупка</span
+								><BadgeCheck size={14} /> {t.reviews.verified}</span
 							>{/if}
 					</p>
 					<p class="mt-3 max-w-2xl">{r.text}</p>
 					{#if r.pros || r.cons}
 						<dl class="mt-3 grid gap-1 text-sm">
 							{#if r.pros}<div class="flex gap-2">
-									<dt class="w-20 shrink-0 text-graphite">Переваги</dt>
+									<dt class="w-20 shrink-0 text-graphite">{t.reviews.pros}</dt>
 									<dd>{r.pros}</dd>
 								</div>{/if}
 							{#if r.cons}<div class="flex gap-2">
-									<dt class="w-20 shrink-0 text-graphite">Недоліки</dt>
+									<dt class="w-20 shrink-0 text-graphite">{t.reviews.cons}</dt>
 									<dd>{r.cons}</dd>
 								</div>{/if}
 						</dl>
 					{/if}
 				</li>
 			{:else}
-				<li class="py-8 text-graphite">Відгуків з такою оцінкою поки немає.</li>
+				<li class="py-8 text-graphite">{t.reviews.none}</li>
 			{/each}
 		</ul>
 	</div>

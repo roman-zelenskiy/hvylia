@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import { Spring } from 'svelte/motion';
 	import { reducedMotion } from '#lib/motion.ts';
 
@@ -38,24 +39,22 @@
 			type="button"
 			role="switch"
 			aria-checked={on}
-			aria-label="Активне шумозаглушення (ANC)"
+			aria-label={t.anc.aria}
 			class="switch"
 			onclick={() => (on = !on)}
 		>
 			<span class="knob" aria-hidden="true"></span>
-			<span class="whitespace-nowrap">ANC {on ? 'увімкнено' : 'вимкнено'}</span>
+			<span class="whitespace-nowrap">{t.anc.state(on)}</span>
 		</button>
-		<p class="mt-8 text-white/60">Рівень шуму в салоні літака</p>
+		<p class="mt-8 text-white/60">{t.anc.cabin}</p>
 		<p
 			class="mono mt-1 text-[clamp(3rem,7vw,5.5rem)] leading-none font-medium tracking-tight text-white"
 			aria-live="polite"
 		>
-			{db}<span class="text-[0.4em] text-white/50"> дБ</span>
+			{db}<span class="text-[0.4em] text-white/50">{t.anc.db}</span>
 		</p>
 		<p class="mt-3 max-w-sm text-white/60">
-			{on
-				? 'Двигуни й вентиляція зникають — лишається тиха музика.'
-				: 'Гул двигунів, вентиляція, розмови поруч. Увімкніть ANC.'}
+			{on ? t.anc.on : t.anc.off}
 		</p>
 	</div>
 	<div class="wave-wrap relative overflow-hidden" aria-hidden="true">

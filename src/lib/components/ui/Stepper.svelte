@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import { Minus, Plus } from '@lucide/svelte';
 
 	/** Лічильник замість нативного number: кнопки −/+, введення цифр, стрілки ↑↓ */
@@ -6,7 +7,7 @@
 		value = $bindable(1),
 		min = 1,
 		max = 10,
-		label = 'Кількість',
+		label = t.qty,
 		size = 'md',
 		onchange
 	}: {
@@ -38,7 +39,7 @@
 		class="stepper-btn"
 		onclick={() => set(value - 1)}
 		disabled={value <= min}
-		aria-label="Зменшити"
+		aria-label={t.less}
 	>
 		<Minus size={14} />
 	</button>
@@ -60,7 +61,7 @@
 		class="stepper-btn"
 		onclick={() => set(value + 1)}
 		disabled={value >= max}
-		aria-label="Збільшити"
+		aria-label={t.more}
 	>
 		<Plus size={14} />
 	</button>

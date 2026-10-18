@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import { formatNumber } from '#lib/catalog/format.ts';
 
 	/**
@@ -11,7 +12,7 @@
 		low,
 		high,
 		step = 100,
-		label = 'Ціна',
+		label = t.range.price,
 		onchange
 	}: {
 		min: number;
@@ -88,7 +89,7 @@
 			style:left="{pct(lo)}%"
 			style:right="{100 - pct(hi)}%"
 		></div>
-		{#each [['lo', lo, 'Мінімальна'], ['hi', hi, 'Максимальна']] as const as [which, v, name] (which)}
+		{#each [['lo', lo, t.range.min], ['hi', hi, t.range.max]] as const as [which, v, name] (which)}
 			<span
 				role="slider"
 				tabindex="0"
@@ -96,7 +97,7 @@
 				aria-valuemin={min}
 				aria-valuemax={max}
 				aria-valuenow={v}
-				aria-valuetext="{formatNumber(v)} грн"
+				aria-valuetext={t.range.uah(formatNumber(v))}
 				class={['thumb', dragging === which && 'is-drag']}
 				style:left="{pct(v)}%"
 				onkeydown={(e) => key(which, e)}
@@ -104,7 +105,7 @@
 		{/each}
 	</div>
 	<div class="mt-2 grid grid-cols-2 gap-2">
-		{#each [['lo', 'Від'], ['hi', 'До']] as const as [which, text] (which)}
+		{#each [['lo', t.range.from], ['hi', t.range.to]] as const as [which, text] (which)}
 			<label class="relative">
 				<span class="sr-only">{label} {text.toLowerCase()}</span>
 				<span

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import { onMount } from 'svelte';
 
 	/**
@@ -25,25 +26,21 @@
 		return () => io.disconnect();
 	});
 
+	const L = t.landing;
 	const anc = [
-		{ place: 'Метро', off: 85, on: 57 },
-		{ place: 'Літак', off: 80, on: 52 },
-		{ place: 'Офіс', off: 62, on: 40 }
+		{ place: L.places[0], off: 85, on: 57 },
+		{ place: L.places[1], off: 80, on: 52 },
+		{ place: L.places[2], off: 62, on: 40 }
 	];
-	const ip = [
-		{ code: 'IPX4', text: 'Піт і бризки', use: 'Зал, прогулянки' },
-		{ code: 'IPX5', text: 'Струмінь води', use: 'Біг під дощем' },
-		{ code: 'IP55', text: 'Пил і вода', use: 'Трейл, вело' },
-		{ code: 'IPX7', text: 'Занурення до 1 м', use: 'Можна промити' }
-	];
+	const ip = ['IPX4', 'IPX5', 'IP55', 'IPX7'].map((code, i) => ({ code, ...L.ip[i] }));
 	const battery = [
-		{ name: 'TWS', buds: 6, extra: 24, extraLabel: 'з кейсом' },
-		{ name: 'Накладні', buds: 45, extra: 0, extraLabel: '' }
+		{ name: 'TWS', buds: 6, extra: 24, extraLabel: L.withCase },
+		{ name: L.onEar, buds: 45, extra: 0, extraLabel: '' }
 	];
 	const portable = [
-		{ size: 'Міні', w: 5, h: 12 },
-		{ size: 'Середня', w: 20, h: 16 },
-		{ size: 'Велика', w: 40, h: 20 }
+		{ size: L.sizes[0], w: 5, h: 12 },
+		{ size: L.sizes[1], w: 20, h: 16 },
+		{ size: L.sizes[2], w: 40, h: 20 }
 	];
 	const ohm = [
 		{ v: 16, label: '16' },
@@ -54,20 +51,20 @@
 	];
 	// логарифмічна висота: 16 Ом — найнижчий, 300 Ом — повна висота
 	const ohmH = (v: number) => 0.18 + (0.82 * Math.log(v / 16)) / Math.log(300 / 16);
-	const chain = ['Програвач', 'Фонокоректор', 'Підсилювач', 'Колонки'];
+	const chain = L.chain;
 </script>
 
 <figure bind:this={el} class={['lg-card', armed && !on && 'off']}>
 	{#if id === 'z-shumopodavlenniam'}
-		<figcaption class="cap">Рівень шуму, дБ</figcaption>
+		<figcaption class="cap">{L.noiseCap}</figcaption>
 		<ul class="legend" aria-hidden="true">
-			<li><i class="sw a"></i>Без ANC</li>
-			<li><i class="sw b"></i>З ANC</li>
+			<li><i class="sw a"></i>{L.noAnc}</li>
+			<li><i class="sw b"></i>{L.withAnc}</li>
 		</ul>
 		<div class="sr-only">
 			<table>
-				<caption>Рівень шуму без і з шумозаглушенням, дБ</caption>
-				<thead><tr><th>Місце</th><th>Без ANC</th><th>З ANC</th></tr></thead>
+				<caption>{L.noiseTable}</caption>
+				<thead><tr><th>{L.place}</th><th>{L.noAnc}</th><th>{L.withAnc}</th></tr></thead>
 				<tbody>
 					{#each anc as r (r.place)}<tr><th>{r.place}</th><td>{r.off}</td><td>{r.on}</td></tr
 						>{/each}
@@ -91,9 +88,9 @@
 				</div>
 			{/each}
 		</div>
-		<p class="note">Мінус 25–30 дБ — це як вчетверо тихіше на слух.</p>
+		<p class="note">{L.noiseNote}</p>
 	{:else if id === 'dlia-sportu'}
-		<figcaption class="cap">Захист від води й поту</figcaption>
+		<figcaption class="cap">{L.ipCap}</figcaption>
 		<ol class="mt-6 grid grid-cols-4 items-start gap-2">
 			{#each ip as s, i (s.code)}
 				<li class="min-w-0">
@@ -109,21 +106,19 @@
 				</li>
 			{/each}
 		</ol>
-		<p class="note">Для залу вистачить IPX4. Бігаєте в будь-яку погоду — беріть від IPX5.</p>
+		<p class="note">{L.ipNote}</p>
 	{:else if id === 'do-3000-hrn'}
-		<figcaption class="cap">Скільки годин музики, год</figcaption>
+		<figcaption class="cap">{L.hoursCap}</figcaption>
 		<ul class="legend" aria-hidden="true">
-			<li><i class="sw b"></i>Від одного заряду</li>
-			<li><i class="sw a"></i>Підзарядка з кейсу</li>
+			<li><i class="sw b"></i>{L.oneCharge}</li>
+			<li><i class="sw a"></i>{L.fromCase}</li>
 		</ul>
 		<div class="mt-6 grid gap-5">
 			{#each battery as b, i (b.name)}
 				<div>
 					<p class="text-sm font-medium">
 						{b.name}
-						<span class="sr-only"
-							>: {b.buds} год від заряду{b.extra ? `, ще ${b.extra} год ${b.extraLabel}` : ''}</span
-						>
+						<span class="sr-only">{L.hoursLine(b.buds, b.extra, b.extraLabel)}</span>
 					</p>
 					<div class="mt-2 flex items-center gap-3" aria-hidden="true">
 						<div class="flex flex-1 gap-[2px]">
@@ -141,15 +136,10 @@
 				</div>
 			{/each}
 		</div>
-		<p class="note">До 3000 ₴ уже є кодек AAC, мультипоінт і заряд через USB-C.</p>
+		<p class="note">{L.budgetNote}</p>
 	{:else if id === 'dlia-domu'}
-		<figcaption class="cap">Стереотрикутник: як поставити колонки</figcaption>
-		<svg
-			viewBox="0 0 320 250"
-			class="mt-4 w-full"
-			role="img"
-			aria-label="Дві колонки й місце слухача утворюють рівносторонній трикутник зі сторонами близько 2,5 м; колонки трохи розвернуті до слухача"
-		>
+		<figcaption class="cap">{L.stereoCap}</figcaption>
+		<svg viewBox="0 0 320 250" class="mt-4 w-full" role="img" aria-label={L.stereoAria}>
 			<g class="tri">
 				<path
 					d="M70 50 L250 50 L160 206 Z"
@@ -185,19 +175,19 @@
 				<circle r="14" fill="var(--color-blue)" />
 				<circle r="5" fill="#fff" />
 			</g>
-			<text x="160" y="38" text-anchor="middle" class="svgt">2,5 м</text>
-			<text x="98" y="140" text-anchor="end" class="svgt">2,5 м</text>
-			<text x="222" y="140" class="svgt">2,5 м</text>
+			<text x="160" y="38" text-anchor="middle" class="svgt">{L.m25}</text>
+			<text x="98" y="140" text-anchor="end" class="svgt">{L.m25}</text>
+			<text x="222" y="140" class="svgt">{L.m25}</text>
 			<text x="160" y="104" text-anchor="middle" class="svgt mute">60°</text>
-			<text x="160" y="240" text-anchor="middle" class="svgt mute">Ви</text>
+			<text x="160" y="240" text-anchor="middle" class="svgt mute">{L.you}</text>
 		</svg>
-		<p class="note">Колонки — на рівні вух і щонайменше 30 см від стіни: бас стане чистішим.</p>
+		<p class="note">{L.stereoNote}</p>
 	{:else if id === 'portatyvni-do-5000-hrn'}
-		<figcaption class="cap">Що дає більший корпус</figcaption>
+		<figcaption class="cap">{L.sizeCap}</figcaption>
 		<div class="sr-only">
 			<table>
-				<caption>Типова потужність і автономність портативних колонок</caption>
-				<thead><tr><th>Розмір</th><th>Потужність, Вт</th><th>Автономність, год</th></tr></thead>
+				<caption>{L.sizeTable}</caption>
+				<thead><tr><th>{L.size}</th><th>{L.power}</th><th>{L.battery}</th></tr></thead>
 				<tbody>
 					{#each portable as r (r.size)}<tr><th>{r.size}</th><td>{r.w}</td><td>{r.h}</td></tr
 						>{/each}
@@ -205,7 +195,7 @@
 			</table>
 		</div>
 		<div class="mt-6 grid grid-cols-2 gap-6" aria-hidden="true">
-			{#each [{ key: 'w', title: 'Потужність, Вт', max: 40 }, { key: 'h', title: 'Автономність, год', max: 20 }] as m, mi (m.key)}
+			{#each [{ key: 'w', title: L.power, max: 40 }, { key: 'h', title: L.battery, max: 20 }] as m, mi (m.key)}
 				<div>
 					<p class="text-sm text-graphite">{m.title}</p>
 					<div class="mt-3 grid gap-3">
@@ -224,9 +214,9 @@
 				</div>
 			{/each}
 		</div>
-		<p class="note">Для пікніка вистачить 20 Вт; міні-колонка — для душу й велосипеда.</p>
+		<p class="note">{L.sizeNote}</p>
 	{:else if id === 'dlia-pochatkivtsiv'}
-		<figcaption class="cap">Шлях сигналу від платівки до колонок</figcaption>
+		<figcaption class="cap">{L.chainCap}</figcaption>
 		<ol
 			class="chain mt-6 text-[13px] sm:text-sm"
 			bind:clientWidth={chainW}
@@ -235,17 +225,17 @@
 			{#each chain as step, i (step)}
 				<li style:--d="{i * 120}ms">
 					<span class="node">{i + 1}</span>
-					<span class="mt-2 block font-medium break-words hyphens-auto" lang="uk">{step}</span>
-					{#if i === 1}<span class="block text-xs text-graphite">часто вбудований</span>{/if}
+					<span class="mt-2 block font-medium break-words hyphens-auto">{step}</span>
+					{#if i === 1}<span class="block text-xs text-graphite">{L.builtIn}</span>{/if}
 				</li>
 			{/each}
 			<span class="pulse" aria-hidden="true"></span>
 		</ol>
 		<p class="note">
-			Фонокоректор підсилює слабкий сигнал голки. Є в програвачі — колонки можна підключати одразу.
+			{L.chainNote}
 		</p>
 	{:else if id === 'dlia-navushnykiv'}
-		<figcaption class="cap">Опір навушників, Ом</figcaption>
+		<figcaption class="cap">{L.ohmCap}</figcaption>
 		<div class="relative mt-6">
 			<ol class="grid h-52 grid-cols-5 items-end gap-2">
 				{#each ohm as o, i (o.v)}
@@ -253,18 +243,18 @@
 						<span class="vbar" style:--h={ohmH(o.v)} style:--d="{i * 100}ms" aria-hidden="true"
 						></span>
 						<span class="mono mt-2 block text-center text-sm"
-							>{o.label}<span class="sr-only"> Ом</span></span
+							>{o.label}<span class="sr-only">{L.ohm}</span></span
 						>
 					</li>
 				{/each}
 			</ol>
 			<div class="mt-4 grid grid-cols-5 gap-2 text-xs">
-				<p class="bracket col-span-2">Телефон і ноутбук впораються</p>
-				<p class="bracket col-span-1">Бажано</p>
-				<p class="bracket col-span-2">Потрібен підсилювач</p>
+				<p class="bracket col-span-2">{L.ohmLow}</p>
+				<p class="bracket col-span-1">{L.ohmMid}</p>
+				<p class="bracket col-span-2">{L.ohmHigh}</p>
 			</div>
 		</div>
-		<p class="note">Студійні моделі на 250–300 Ом розкриваються лише з окремим підсилювачем.</p>
+		<p class="note">{L.ohmNote}</p>
 	{/if}
 </figure>
 

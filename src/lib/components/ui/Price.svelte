@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import { discount, formatPrice } from '#lib/catalog/format.ts';
 
 	let {
@@ -12,11 +13,11 @@
 
 <span class="inline-flex flex-wrap items-baseline gap-x-2">
 	<span class="mono font-medium {cls[size]} {off ? 'text-blue' : ''}">
-		{#if off}<span class="sr-only">Ціна зі знижкою: </span>{/if}{formatPrice(price)}
+		{#if off}<span class="sr-only">{t.priceSale}</span>{/if}{formatPrice(price)}
 	</span>
 	{#if off}
 		<s class="mono text-[13px] text-mute"
-			><span class="sr-only">Стара ціна: </span>{formatPrice(old!)}</s
+			><span class="sr-only">{t.priceOld}</span>{formatPrice(old!)}</s
 		>
 	{/if}
 </span>

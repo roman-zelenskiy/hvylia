@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import { siteUrl, shop } from '#lib/data/site.ts';
+	import { lang } from '#lib/lang.ts';
 
 	/**
 	 * Мета-теги сторінки. canonical завжди без query (фільтри й пагінація вказують на основну сторінку),
@@ -23,7 +25,8 @@
 		jsonld?: object[];
 	} = $props();
 
-	const canonical = $derived(`${siteUrl}${path === '/' ? '/' : path}`);
+	const at = (l: string) => `${siteUrl}/${l}${path === '/' ? '' : path}`;
+	const canonical = $derived(at(lang));
 	const img = $derived(image.startsWith('http') ? image : `${siteUrl}${image}`);
 	const ld = $derived(
 		jsonld.length
@@ -41,10 +44,13 @@
 	<title>{title}</title>
 	<meta name="description" content={description} />
 	<link rel="canonical" href={canonical} />
+	<link rel="alternate" hreflang="uk" href={at('uk')} />
+	<link rel="alternate" hreflang="en" href={at('en')} />
+	<link rel="alternate" hreflang="x-default" href={at('uk')} />
 	{#if noindex}<meta name="robots" content="noindex, follow" />{/if}
 	<meta property="og:type" content={type} />
-	<meta property="og:locale" content="uk_UA" />
-	<meta property="og:site_name" content="«{shop.name}» — аудіотехніка" />
+	<meta property="og:locale" content={t.seo.ogLocale} />
+	<meta property="og:site_name" content={t.seo.siteName(shop.name)} />
 	<meta property="og:title" content={title} />
 	<meta property="og:description" content={description} />
 	<meta property="og:url" content={canonical} />

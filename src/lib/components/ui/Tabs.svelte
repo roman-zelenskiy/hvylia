@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import type { Snippet } from 'svelte';
 
 	/** Таби: стрілки/Home/End, roving tabindex; лінія-індикатор переїжджає через transform */
@@ -39,11 +40,7 @@
 </script>
 
 <div class="relative border-b border-line">
-	<div
-		role="tablist"
-		aria-label="Інформація про товар"
-		class="no-scrollbar flex gap-1 overflow-x-auto"
-	>
+	<div role="tablist" aria-label={t.productInfo} class="no-scrollbar flex gap-1 overflow-x-auto">
 		{#each tabs as t, i (t.id)}
 			<button
 				bind:this={buttons[i]}

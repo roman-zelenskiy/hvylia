@@ -8,7 +8,7 @@ import { siteUrl } from '#lib/data/site.ts';
 export const prerender = true;
 
 export function GET() {
-	const today = '2026-10-11';
+	const today = '2026-10-18';
 	const urls: { loc: string; lastmod: string; priority: string }[] = [
 		{ loc: '/', lastmod: today, priority: '1.0' },
 		...categories.flatMap((c) => [
@@ -21,9 +21,25 @@ export function GET() {
 		...brands.map((b) => ({ loc: `/brand/${b.slug}`, lastmod: today, priority: '0.5' })),
 		...Object.keys(info).map((slug) => ({ loc: `/${slug}`, lastmod: today, priority: '0.3' }))
 	];
+	// кожна сторінка — у двох мовних версіях з посиланнями одна на одну (hreflang)
+	const at = (l: string, loc: string) => `${siteUrl}/${l}${loc === '/' ? '' : loc}`;
+	const alt = (loc: string) =>
+		['uk', 'en', 'x-default']
+			.map(
+				(l) =>
+					`<xhtml:link rel="alternate" hreflang="${l}" href="${at(l === 'x-default' ? 'uk' : l, loc)}"/>`
+			)
+			.join('');
 	const body = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map((u) => `\t<url><loc>${siteUrl}${u.loc}</loc><lastmod>${u.lastmod}</lastmod><priority>${u.priority}</priority></url>`).join('\n')}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+${['uk', 'en']
+	.flatMap((l) =>
+		urls.map(
+			(u) =>
+				`\t<url><loc>${at(l, u.loc)}</loc><lastmod>${u.lastmod}</lastmod><priority>${u.priority}</priority>${alt(u.loc)}</url>`
+		)
+	)
+	.join('\n')}
 </urlset>`;
 	return new Response(body, { headers: { 'Content-Type': 'application/xml; charset=utf-8' } });
 }

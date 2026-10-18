@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
+	import { t as ui } from '#lib/ui.ts';
+	import { lhref } from '#lib/lang.ts';
 	import { X } from '@lucide/svelte';
 	import { flip } from 'svelte/animate';
 	import { fly } from 'svelte/transition';
@@ -19,13 +20,13 @@
 		>
 			<span class="flex-1">{t.text}</span>
 			{#if t.action}<a
-					href={resolve(t.action.href as '/')}
+					href={lhref(t.action.href as '/')}
 					class="font-medium text-[#9fb0ff] hover:text-white">{t.action.label}</a
 				>{/if}
 			<button
 				type="button"
 				class="icon-btn !h-8 !w-8 text-white hover:!bg-white/10"
-				aria-label="Закрити повідомлення"
+				aria-label={ui.toastClose}
 				onclick={() => toast.dismiss(t.id)}><X size={15} /></button
 			>
 		</div>

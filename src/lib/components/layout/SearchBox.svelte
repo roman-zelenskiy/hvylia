@@ -1,6 +1,7 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
+	import { lhref } from '#lib/lang.ts';
 	import { Search, X, Clock, FolderOpen } from '@lucide/svelte';
 	import { fly } from 'svelte/transition';
 	import { search, type SearchHit } from '#lib/api/client.ts';
@@ -11,7 +12,7 @@
 	/** Пошук з автокомплітом: debounce, категорії й товари, підсвітка збігів, стрілки, недавні запити */
 	let {
 		id = 'search',
-		label = 'Пошук по сайту',
+		label = t.search.label,
 		autofocus = false,
 		onnavigate
 	}: { id?: string; label?: string; autofocus?: boolean; onnavigate?: () => void } = $props();
@@ -91,7 +92,7 @@
 		if (term) remember(term);
 		open = false;
 		onnavigate?.();
-		goto(resolve(href as '/'));
+		goto(lhref(href as '/'));
 	}
 
 	/** Підсвітка збігів: розбиваємо назву на шматки, збіги — у <mark> */
@@ -134,7 +135,7 @@
 		else if (q.trim()) go(`/search?q=${encodeURIComponent(q.trim())}`, q);
 	}}
 >
-	<label for={id} class="sr-only">Пошук товарів</label>
+	<label for={id} class="sr-only">{t.search.sr}</label>
 	<Search
 		size={17}
 		class="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-graphite"
@@ -150,7 +151,7 @@
 		aria-activedescendant={active >= 0 ? `${id}-o${active}` : undefined}
 		autocomplete="off"
 		{autofocus}
-		placeholder="Навушники, колонка, програвач…"
+		placeholder={t.search.placeholder}
 		class="field !h-11 !bg-paper pr-10 pl-10 focus:!bg-white"
 		bind:value={q}
 		oninput={onInput}
@@ -176,7 +177,7 @@
 		<button
 			type="button"
 			class="icon-btn absolute top-1/2 right-1 !h-9 !w-9 -translate-y-1/2"
-			aria-label="Очистити пошук"
+			aria-label={t.search.clear}
 			onclick={() => ((q = ''), onInput())}
 		>
 			<X size={16} />
@@ -188,11 +189,11 @@
 			class="popover absolute top-full right-0 left-0 z-40 mt-1.5 max-h-[70vh] overflow-auto p-1.5"
 			transition:fly={{ y: -4, duration: 140 }}
 		>
-			{#if q.trim().length < 2}<p class="eyebrow px-3 pt-2 pb-1">Нещодавно шукали</p>{/if}
-			<ul id="{id}-list" role="listbox" aria-label="Підказки пошуку">
+			{#if q.trim().length < 2}<p class="eyebrow px-3 pt-2 pb-1">{t.search.recent}</p>{/if}
+			<ul id="{id}-list" role="listbox" aria-label={t.search.hints}>
 				{#each items as item, i (item.kind + item.href)}
 					{#if item.kind === 'product' && (i === 0 || items[i - 1].kind !== 'product')}
-						<li role="presentation" class="eyebrow px-3 pt-3 pb-1">Товари</li>
+						<li role="presentation" class="eyebrow px-3 pt-3 pb-1">{t.search.products}</li>
 					{/if}
 					<!-- клавіатура обробляється на рівні listbox/combobox (стрілки, Enter) -->
 					<!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -236,12 +237,10 @@
 					</div>
 				{:else if hits && !items.length}
 					<p class="px-3 py-4 text-sm text-graphite" role="status">
-						Нічого не знайдено за «{q}». Спробуйте «навушники» або назву бренду.
+						{t.search.none(q)}
 					</p>
 				{:else}
-					<button type="submit" class="option mt-1 !text-blue"
-						>Усі результати за «{q.trim()}» →</button
-					>
+					<button type="submit" class="option mt-1 !text-blue">{t.search.all(q.trim())}</button>
 				{/if}
 			{/if}
 		</div>

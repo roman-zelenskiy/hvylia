@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
+	import { t } from '#lib/ui.ts';
+	import { lhref } from '#lib/lang.ts';
 	import { Heart, Scale, Plus, Check } from '@lucide/svelte';
 	import type { Summary } from '#lib/catalog/query.ts';
 	import { discount, formatPrice } from '#lib/catalog/format.ts';
@@ -18,7 +19,7 @@
 	const out = $derived(p.stock === 'out');
 	const cut = $derived(productCutout(p.slug));
 	let added = $state(false);
-	const href = $derived(resolve('/product/[slug]', { slug: p.slug }));
+	const href = $derived(lhref('/product/[slug]', { slug: p.slug }));
 </script>
 
 <article
@@ -55,9 +56,11 @@
 		{/if}
 		<div class="absolute top-3 left-3 z-10 flex gap-1.5">
 			{#if off}<span class="badge bg-blue text-white">−{off}%</span>{/if}
-			{#if p.badges.includes('new')}<span class="badge bg-white text-ink shadow-sm">Новинка</span
+			{#if p.badges.includes('new')}<span class="badge bg-white text-ink shadow-sm"
+					>{t.card.new}</span
 				>{/if}
-			{#if p.badges.includes('hit') && !off}<span class="badge bg-ink text-white">Хіт</span>{/if}
+			{#if p.badges.includes('hit') && !off}<span class="badge bg-ink text-white">{t.card.hit}</span
+				>{/if}
 		</div>
 		<div
 			class="absolute top-2.5 right-2.5 z-10 flex flex-col gap-1 opacity-100 transition-opacity duration-200 md:opacity-0 md:group-focus-within:opacity-100 md:group-hover:opacity-100 [&:has([aria-pressed=true])]:opacity-100"
@@ -66,7 +69,7 @@
 				type="button"
 				class="icon-btn bg-white/90 shadow-sm backdrop-blur"
 				aria-pressed={wishlist.ready && wishlist.has(p.slug)}
-				aria-label="В обране: {p.name}"
+				aria-label={t.card.wish(p.name)}
 				onclick={() => toggleWishlist(p.slug, p.name)}
 			>
 				<Heart size={17} fill={wishlist.ready && wishlist.has(p.slug) ? 'currentColor' : 'none'} />
@@ -75,7 +78,7 @@
 				type="button"
 				class="icon-btn bg-white/90 shadow-sm backdrop-blur"
 				aria-pressed={compare.ready && compare.has(p.slug)}
-				aria-label="Порівняти: {p.name}"
+				aria-label={t.card.compare(p.name)}
 				onclick={() => toggleCompare(p.slug, p.name)}
 			>
 				<Scale size={17} />
@@ -85,7 +88,7 @@
 			type="button"
 			class="add absolute right-3 bottom-3 z-10 grid h-11 w-11 place-items-center rounded-full bg-ink text-white shadow-[var(--shadow-pop)] transition-[transform,background-color] duration-300 ease-[var(--ease-out-soft)] hover:bg-blue disabled:bg-line-2"
 			disabled={out}
-			aria-label={out ? `${p.name}: немає в наявності` : `У кошик: ${p.name}`}
+			aria-label={out ? t.card.outAria(p.name) : t.card.addAria(p.name)}
 			onclick={() => {
 				addToCart(p.slug, p.colors[0]?.id ?? 'default', 1, p.name);
 				added = true;
@@ -105,17 +108,17 @@
 			<a {href} class="after:absolute after:inset-0 after:z-0 hover:text-blue">{p.name}</a>
 		</h3>
 		{#if view === 'list'}<p class="mt-2 line-clamp-2 text-[15px] text-graphite">{p.short}</p>{/if}
-		<div class="mt-auto flex items-center justify-between gap-3 pt-3">
-			<p class="flex items-baseline gap-2">
+		<div class="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 pt-3">
+			<p class="flex min-w-0 flex-wrap items-baseline gap-x-2">
 				<span class={['mono text-[17px] font-medium', off && 'text-blue']}
-					>{#if off}<span class="sr-only">Ціна зі знижкою: </span>{/if}{formatPrice(p.price)}</span
+					>{#if off}<span class="sr-only">{t.priceSale}</span>{/if}{formatPrice(p.price)}</span
 				>
 				{#if p.oldPrice}<s class="mono text-[13px] text-mute"
-						><span class="sr-only">Стара ціна: </span>{formatPrice(p.oldPrice)}</s
+						><span class="sr-only">{t.priceOld}</span>{formatPrice(p.oldPrice)}</s
 					>{/if}
 			</p>
 			{#if p.colors.length > 1}
-				<ul class="flex -space-x-1" aria-label="Кольори">
+				<ul class="flex shrink-0 -space-x-1" aria-label={t.card.colors}>
 					{#each p.colors as c (c.id)}<li
 							class="h-4 w-4 rounded-full ring-2 ring-paper"
 							style:background={c.hex}
@@ -127,9 +130,9 @@
 			{/if}
 		</div>
 		{#if out}<p class="mt-1 text-[13px] text-alert">
-				Немає в наявності
+				{t.card.out}
 			</p>{:else if p.stock === 'low'}<p class="mt-1 text-[13px] text-[#9a5300]">
-				Закінчується
+				{t.card.low}
 			</p>{/if}
 	</div>
 </article>

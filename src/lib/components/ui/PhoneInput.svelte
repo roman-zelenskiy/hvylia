@@ -1,11 +1,12 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import { formatPhone, isValidPhone } from '#lib/phone.ts';
 
 	/** Телефон з маскою +380 (XX) XXX-XX-XX */
 	let {
 		value = $bindable(''),
 		id,
-		label = 'Телефон',
+		label = t.phone,
 		error = '',
 		required = true
 	}: { value?: string; id: string; label?: string; error?: string; required?: boolean } = $props();

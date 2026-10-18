@@ -1,4 +1,5 @@
-import { resolve } from '$app/paths';
+import { t } from '#lib/ui.ts';
+import { lhref } from '#lib/lang.ts';
 import {
 	emptyFilters,
 	runQuery,
@@ -25,8 +26,8 @@ type CatalogPayload = {
 
 let catalog: Promise<CatalogPayload> | null = null;
 export function loadCatalog() {
-	catalog ??= fetch(resolve('/api/catalog.json')).then((r) => {
-		if (!r.ok) throw new Error(`Каталог недоступний (${r.status})`);
+	catalog ??= fetch(lhref('/api/catalog.json')).then((r) => {
+		if (!r.ok) throw new Error(t.api.unavailable(r.status));
 		return r.json() as Promise<CatalogPayload>;
 	});
 	catalog.catch(() => (catalog = null));
@@ -73,7 +74,7 @@ export async function search(q: string): Promise<SearchHit> {
 
 let np: Promise<NpCity[]> | null = null;
 const loadNp = () =>
-	(np ??= fetch(resolve('/api/np.json')).then((r) => r.json() as Promise<NpCity[]>));
+	(np ??= fetch(lhref('/api/np.json')).then((r) => r.json() as Promise<NpCity[]>));
 
 /** GET /api/np-branches — міста і відділення з пошуком */
 export async function npCitiesSearch(q: string) {
@@ -130,11 +131,10 @@ const ORDERS = 'hvylia:orders';
 export async function createOrder(input: Omit<Order, 'id' | 'createdAt'>): Promise<Order> {
 	await delay(500, 900);
 	const fields: Record<string, string> = {};
-	if (!input.lines.length) fields.lines = 'Кошик порожній';
-	if (input.contact.name.trim().length < 2) fields.name = 'Вкажіть ім’я';
-	if (!/^\+380 \(\d{2}\) \d{3}-\d{2}-\d{2}$/.test(input.contact.phone))
-		fields.phone = 'Номер неповний';
-	if (Object.keys(fields).length) throw new ApiError(422, 'Перевірте дані замовлення', fields);
+	if (!input.lines.length) fields.lines = t.api.empty;
+	if (input.contact.name.trim().length < 2) fields.name = t.api.name;
+	if (!/^\+380 \(\d{2}\) \d{3}-\d{2}-\d{2}$/.test(input.contact.phone)) fields.phone = t.api.phone;
+	if (Object.keys(fields).length) throw new ApiError(422, t.api.check, fields);
 	const order: Order = {
 		...input,
 		id: `HV-${String(Date.now()).slice(-7)}`,

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import type { Snippet } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
 	import { X } from '@lucide/svelte';
@@ -14,7 +15,7 @@
 		labelledby,
 		side = 'center',
 		width = 'max-w-lg',
-		closeLabel = 'Закрити',
+		closeLabel = t.close,
 		children
 	}: {
 		open?: boolean;

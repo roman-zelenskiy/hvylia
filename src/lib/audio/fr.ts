@@ -1,3 +1,4 @@
+import { lang } from '#lib/lang-core.ts';
 /**
  * Частотні характеристики (АЧХ) для графіків. Дані демонстраційні, але правдоподібні:
  * побудовані з типових для кожного класу пристроїв рис — підйом басу, вушний резонанс близько 3 кГц,
@@ -96,9 +97,12 @@ export function pathOf(values: number[], w: number, h: number) {
 	return d;
 }
 
+const en = () => lang === 'en';
+/** Десятковий розділювач і одиниці мовою сторінки: «1,5 кГц» / «1.5 kHz» */
+const dec = (s: string) => (en() ? s : s.replace('.', ','));
 export const fmtHz = (f: number) =>
 	f >= 1000
-		? `${(f / 1000).toFixed(f >= 10000 ? 0 : 1).replace('.', ',')} кГц`
-		: `${Math.round(f)} Гц`;
+		? `${dec((f / 1000).toFixed(f >= 10000 ? 0 : 1))} ${en() ? 'kHz' : 'кГц'}`
+		: `${Math.round(f)} ${en() ? 'Hz' : 'Гц'}`;
 export const fmtDb = (db: number) =>
-	`${db >= 0 ? '+' : '−'}${Math.abs(db).toFixed(1).replace('.', ',')} дБ`;
+	`${db >= 0 ? '+' : '−'}${dec(Math.abs(db).toFixed(1))} ${en() ? 'dB' : 'дБ'}`;

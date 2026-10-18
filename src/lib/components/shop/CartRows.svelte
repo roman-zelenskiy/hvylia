@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
+	import { t } from '#lib/ui.ts';
+	import { lhref } from '#lib/lang.ts';
 	import { Trash2 } from '@lucide/svelte';
 	import { flip } from 'svelte/animate';
 	import { fade } from 'svelte/transition';
@@ -18,7 +19,7 @@
 	{#each rows as r (r.key)}
 		<li class="flex gap-4 py-4" animate:flip={{ duration: ms() }} out:fade={{ duration: ms() / 2 }}>
 			<a
-				href={resolve('/product/[slug]', { slug: r.slug })}
+				href={lhref('/product/[slug]', { slug: r.slug })}
 				class="stage relative shrink-0 overflow-hidden rounded-sm {compact
 					? 'h-20 w-20'
 					: 'h-24 w-24'}"
@@ -45,7 +46,7 @@
 				<div class="flex items-start justify-between gap-3">
 					<div class="min-w-0">
 						<a
-							href={resolve('/product/[slug]', { slug: r.slug })}
+							href={lhref('/product/[slug]', { slug: r.slug })}
 							class="text-[15px] leading-snug font-medium hover:text-blue">{r.product.name}</a
 						>
 						<p class="mt-0.5 text-[13px] text-graphite">{r.colorName}</p>
@@ -53,10 +54,10 @@
 					<button
 						type="button"
 						class="icon-btn -mt-2 -mr-2 shrink-0 text-graphite hover:!text-alert"
-						aria-label="Видалити: {r.product.name}, {r.colorName}"
+						aria-label={t.cartRow.remove(r.product.name, r.colorName)}
 						onclick={() => {
 							cart.remove(r.key);
-							announce(`${r.product.name} видалено з кошика`);
+							announce(t.cartRow.removed(r.product.name));
 						}}
 					>
 						<Trash2 size={17} />
@@ -67,7 +68,7 @@
 						size="sm"
 						value={r.qty}
 						max={MAX_QTY}
-						label="Кількість: {r.product.name}"
+						label={t.cartRow.qty(r.product.name)}
 						onchange={(v) => cart.setQty(r.key, v)}
 					/>
 					<span class="mono text-[15px] font-medium">{formatPrice(r.sum)}</span>

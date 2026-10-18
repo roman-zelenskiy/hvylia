@@ -1,8 +1,11 @@
+import { t } from '#lib/ui.ts';
+import { lang } from '#lib/lang.ts';
 import { shop, siteUrl, RETURN_DAYS } from '#lib/data/site.ts';
 import type { Summary } from '#lib/catalog/query.ts';
 import type { Brand, Product, Review } from '#lib/data/types.ts';
 
-const abs = (path: string) => (path.startsWith('http') ? path : `${siteUrl}${path}`);
+const abs = (path: string) =>
+	path.startsWith('http') ? path : `${siteUrl}/${lang}${path === '/' ? '' : path}`;
 
 export const ids = { org: `${siteUrl}/#organization`, site: `${siteUrl}/#website` };
 
@@ -33,12 +36,15 @@ export function website() {
 		'@type': 'WebSite',
 		'@id': ids.site,
 		url: `${siteUrl}/`,
-		name: `«${shop.name}» — аудіотехніка`,
-		inLanguage: 'uk-UA',
+		name: t.seo.siteName(shop.name),
+		inLanguage: t.seo.inLanguage,
 		publisher: { '@id': ids.org },
 		potentialAction: {
 			'@type': 'SearchAction',
-			target: { '@type': 'EntryPoint', urlTemplate: `${siteUrl}/search?q={search_term_string}` },
+			target: {
+				'@type': 'EntryPoint',
+				urlTemplate: `${siteUrl}/${lang}/search?q={search_term_string}`
+			},
 			'query-input': 'required name=search_term_string'
 		}
 	};

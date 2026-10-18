@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import { ChevronLeft, ChevronRight } from '@lucide/svelte';
 
 	/** Справжні посилання ?page=N (для пошуковиків), клієнт перехоплює навігацію сам */
@@ -16,10 +17,10 @@
 </script>
 
 {#if pages > 1}
-	<nav aria-label="Сторінки каталогу" class="flex items-center justify-center gap-1">
+	<nav aria-label={t.pages.nav} class="flex items-center justify-center gap-1">
 		{#if page > 1}
 			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- href() повертає шлях через resolve() -->
-			<a class="pg" href={href(page - 1)} rel="prev" aria-label="Попередня сторінка"
+			<a class="pg" href={href(page - 1)} rel="prev" aria-label={t.pages.prev}
 				><ChevronLeft size={16} /></a
 			>
 		{:else}
@@ -34,14 +35,14 @@
 					class={['pg mono', p === page && 'is-current']}
 					href={href(p)}
 					aria-current={p === page ? 'page' : undefined}
-					aria-label="Сторінка {p}">{p}</a
+					aria-label={t.pages.page(p)}>{p}</a
 				>
 				<!-- eslint-enable svelte/no-navigation-without-resolve -->
 			{/if}
 		{/each}
 		{#if page < pages}
 			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- href() повертає шлях через resolve() -->
-			<a class="pg" href={href(page + 1)} rel="next" aria-label="Наступна сторінка"
+			<a class="pg" href={href(page + 1)} rel="next" aria-label={t.pages.next}
 				><ChevronRight size={16} /></a
 			>
 		{:else}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	let {
 		value,
 		count,
@@ -11,7 +12,7 @@
 <span
 	class="inline-flex items-center gap-1.5"
 	role="img"
-	aria-label="Рейтинг {value.toFixed(1)} з 5{count !== undefined ? `, ${count} відгуків` : ''}"
+	aria-label={t.rating(value.toFixed(1), count)}
 >
 	<span
 		class="relative inline-block leading-none"

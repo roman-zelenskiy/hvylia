@@ -13,6 +13,7 @@ const subSlugs = new Set([
  * з [category] — і на статичному хостингу клієнт одразу показує 404, не шукаючи неіснуючих даних.
  */
 export const params = defineParams({
+	lang: (p: string) => (p === 'uk' || p === 'en' ? p : undefined),
 	category: (p: string) => (categorySlugs.has(p) ? p : undefined),
 	sub: (p: string) => (subSlugs.has(p) ? p : undefined)
 });

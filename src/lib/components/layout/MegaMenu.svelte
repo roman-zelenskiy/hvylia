@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
+	import { t } from '#lib/ui.ts';
+	import { lhref } from '#lib/lang.ts';
 	import { page } from '$app/state';
 	import { ArrowRight, ChevronRight, LayoutGrid, X } from '@lucide/svelte';
 	import { fade, fly } from 'svelte/transition';
@@ -81,7 +82,7 @@
 		onclick={() => (open = !open)}
 	>
 		{#if open}<X size={17} />{:else}<LayoutGrid size={17} />{/if}
-		Каталог
+		{t.mega.catalog}
 	</button>
 
 	{#if open}
@@ -90,12 +91,12 @@
 			class="mega absolute top-[calc(100%+10px)] right-0 left-0 z-40 overflow-hidden rounded-[22px] bg-white"
 			transition:fly={{ y: -10, duration: reducedMotion() ? 0 : 220 }}
 		>
-			<nav aria-label="Каталог товарів" class="grid min-h-[400px] grid-cols-[280px_1fr] gap-0">
+			<nav aria-label={t.mega.nav} class="grid min-h-[400px] grid-cols-[280px_1fr] gap-0">
 				<ul class="bg-paper/60 p-3">
 					{#each nav as c (c.slug)}
 						<li>
 							<a
-								href={resolve('/[category=category]', { category: c.slug })}
+								href={lhref('/[category=category]', { category: c.slug })}
 								class={[
 									'flex h-12 items-center justify-between rounded-sm px-4 text-[16px] font-medium transition-colors',
 									active === c.slug ? 'bg-white text-ink shadow-sm' : 'text-graphite hover:text-ink'
@@ -111,9 +112,9 @@
 					{/each}
 					<li class="mt-2">
 						<a
-							href={resolve('/brand')}
+							href={lhref('/brand')}
 							class="flex h-12 items-center px-4 text-[15px] text-graphite hover:text-ink"
-							>Усі бренди</a
+							>{t.mega.allBrands}</a
 						>
 					</li>
 				</ul>
@@ -126,12 +127,12 @@
 							out:fade={{ duration: 80 }}
 						>
 							<div>
-								<p class="pt-4 text-sm text-mute">Розділи</p>
+								<p class="pt-4 text-sm text-mute">{t.mega.sections}</p>
 								<ul class="mt-3 grid gap-1">
 									{#each current.subs as s (s.slug)}
 										<li>
 											<a
-												href={resolve('/[category=category]/[sub=sub]', {
+												href={lhref('/[category=category]/[sub=sub]', {
 													category: current.slug,
 													sub: s.slug
 												})}
@@ -142,20 +143,20 @@
 									{/each}
 								</ul>
 								<a
-									href={resolve('/[category=category]', { category: current.slug })}
+									href={lhref('/[category=category]', { category: current.slug })}
 									class="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-blue hover:text-blue-ink"
 								>
-									Усі {current.name.toLowerCase()}
+									{t.mega.all(current.name)}
 									<ArrowRight size={14} />
 								</a>
 							</div>
 							<div>
-								<p class="pt-4 text-sm text-mute">Бренди</p>
+								<p class="pt-4 text-sm text-mute">{t.mega.brands}</p>
 								<ul class="mt-3 grid gap-1">
 									{#each brandsIn as [slug, name] (slug)}
 										<li>
 											<a
-												href={resolve('/brand/[slug]', { slug })}
+												href={lhref('/brand/[slug]', { slug })}
 												class="wave-link py-1.5 text-[15px] hover:text-blue">{name}</a
 											>
 										</li>
@@ -164,12 +165,10 @@
 							</div>
 							{#if promo}
 								<a
-									href={resolve('/product/[slug]', { slug: promo.slug })}
+									href={lhref('/product/[slug]', { slug: promo.slug })}
 									class="group stage relative flex flex-col justify-end overflow-hidden rounded-lg p-5"
 								>
-									<span class="absolute top-5 left-5 text-sm text-graphite"
-										>Обирають найчастіше</span
-									>
+									<span class="absolute top-5 left-5 text-sm text-graphite">{t.mega.popular}</span>
 									{#if productCutout(promo.slug)}
 										<enhanced:img
 											src={productCutout(promo.slug)!}

@@ -9,8 +9,10 @@ export function GET() {
 		[
 			'User-agent: *',
 			'Allow: /',
-			'Disallow: /api/',
-			'Disallow: /order',
+			'Disallow: /uk/api/',
+			'Disallow: /en/api/',
+			'Disallow: /uk/order',
+			'Disallow: /en/order',
 			'',
 			`Sitemap: ${siteUrl}/sitemap.xml`,
 			''

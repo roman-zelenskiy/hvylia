@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '#lib/ui.ts';
 	import type { InfoPage } from '#lib/data/info.ts';
 	import { breadcrumbs, faqPage } from '#lib/seo/schema.ts';
 	import Seo from '#lib/seo/Seo.svelte';
@@ -6,7 +7,7 @@
 	import Breadcrumbs from '#lib/components/ui/Breadcrumbs.svelte';
 
 	let { page: p }: { page: InfoPage } = $props();
-	const crumbs = $derived([{ href: '/', label: 'Головна' }, { label: p.h1 }]);
+	const crumbs = $derived([{ href: '/', label: t.home }, { label: p.h1 }]);
 </script>
 
 <Seo
@@ -47,7 +48,7 @@
 		{/each}
 		{#if p.faq}
 			<section aria-labelledby="info-faq-title" class="rounded-lg bg-white p-6 md:p-10">
-				<h2 id="info-faq-title" class="sr-only">Відповіді</h2>
+				<h2 id="info-faq-title" class="sr-only">{t.answers}</h2>
 				<Accordion id="info-faq" items={p.faq} />
 			</section>
 		{/if}

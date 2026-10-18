@@ -1,18 +1,12 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
+	import { t } from '#lib/ui.ts';
+	import { lhref } from '#lib/lang.ts';
 	import { page } from '$app/state';
 	import { shop } from '#lib/data/site.ts';
 	import Logo from '#lib/components/ui/Logo.svelte';
 
 	const nav = $derived(page.data.nav as { slug: string; name: string }[]);
-	const info = [
-		{ href: '/dostavka-i-oplata', label: 'Доставка і оплата' },
-		{ href: '/harantiia-ta-povernennia', label: 'Гарантія та повернення' },
-		{ href: '/faq', label: 'Питання та відповіді' },
-		{ href: '/pro-nas', label: 'Про нас' },
-		{ href: '/kontakty', label: 'Контакти' },
-		{ href: '/polityka-konfidentsiinosti', label: 'Політика конфіденційності' }
-	] as const;
+	const info = t.infoLinks;
 
 	// безшовна хвиля: період 600 по x, малюємо 2 періоди + запас для дрейфу
 	const wave = (() => {
@@ -34,39 +28,39 @@
 			<div>
 				<Logo />
 				<p class="mt-4 max-w-xs text-sm text-white/65">
-					{shop.tagline}. Офіційна гарантія, доставка Новою Поштою по всій Україні.
+					{shop.tagline}. {t.footer.about}
 				</p>
 				<p class="mt-6 max-w-xs text-xs text-white/50">
-					Демо-магазин для портфоліо. Замовлення не обробляються, оплата не списується.
+					{t.footer.demo}
 				</p>
 			</div>
-			<nav aria-label="Каталог">
-				<h2 class="text-sm text-white/50">Каталог</h2>
+			<nav aria-label={t.footer.catalog}>
+				<h2 class="text-sm text-white/50">{t.footer.catalog}</h2>
 				<ul class="mt-4 grid gap-2 text-sm">
 					{#each nav as c (c.slug)}<li>
-							<a href={resolve('/[category=category]', { category: c.slug })} class="wave-link"
+							<a href={lhref('/[category=category]', { category: c.slug })} class="wave-link"
 								>{c.name}</a
 							>
 						</li>{/each}
-					<li><a href={resolve('/brand')} class="wave-link">Бренди</a></li>
+					<li><a href={lhref('/brand')} class="wave-link">{t.footer.brands}</a></li>
 				</ul>
 			</nav>
-			<nav aria-label="Покупцям">
-				<h2 class="text-sm text-white/50">Покупцям</h2>
+			<nav aria-label={t.footer.buyers}>
+				<h2 class="text-sm text-white/50">{t.footer.buyers}</h2>
 				<ul class="mt-4 grid gap-2 text-sm">
 					{#each info as l (l.href)}<li>
-							<a href={resolve(l.href)} class="wave-link">{l.label}</a>
+							<a href={lhref(l.href)} class="wave-link">{l.label}</a>
 						</li>{/each}
 				</ul>
 			</nav>
 			<div>
-				<h2 class="text-sm text-white/50">Аудіо-експерт</h2>
+				<h2 class="text-sm text-white/50">{t.footer.expert}</h2>
 				<a href={shop.phoneHref} rel="external" class="mono mt-4 block text-2xl font-medium"
 					>{shop.phone}</a
 				>
-				<p class="text-sm text-white/65">{shop.hours}, безкоштовно по Україні</p>
+				<p class="text-sm text-white/65">{t.footer.freeCall(shop.hours)}</p>
 				<a href="mailto:{shop.email}" rel="external" class="wave-link mt-3 text-sm">{shop.email}</a>
-				<p class="mt-3 text-sm text-white/65">Шоурум: {shop.city}, {shop.street}</p>
+				<p class="mt-3 text-sm text-white/65">{t.footer.showroom(shop.city, shop.street)}</p>
 				<ul class="mt-4 flex gap-4 text-sm">
 					<li>
 						<a href={shop.telegram} rel="external noopener" target="_blank" class="wave-link"
@@ -93,12 +87,12 @@
 					<path d={wave} fill="none" stroke="#7f8cff" stroke-width="1.5" />
 				</g>
 			</svg>
-			<p class="wordmark select-none" data-text="Хвиля"></p>
+			<p class="wordmark select-none" data-text={t.brand}></p>
 		</div>
 		<p
 			class="flex flex-wrap items-center justify-between gap-2 px-6 pt-2 pb-6 text-xs text-white/50 md:px-12"
 		>
-			<span>© 2026 {shop.legalName}</span><span>Фото: Unsplash</span>
+			<span>© 2026 {shop.legalName}</span><span>{t.footer.photos}</span>
 		</p>
 	</div>
 </footer>
